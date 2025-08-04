@@ -294,22 +294,26 @@ function NotificationCard({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => onFlagChange(notification.id, "red")}>
+                  <DropdownMenuItem onClick={() => handleCurrentPageUpdate(notification.id, "1")}>
                     <Flag className="h-4 w-4 mr-2 text-red-500" />
-                    علم أحمر
+                    معلومات
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onFlagChange(notification.id, "yellow")}>
+                  <DropdownMenuItem onClick={() => handleCurrentPageUpdate(notification.id, "6")}>
                     <Flag className="h-4 w-4 mr-2 text-yellow-500" />
-                    علم أصفر
+             دفع
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onFlagChange(notification.id, "green")}>
+                  <DropdownMenuItem onClick={() => handleCurrentPageUpdate(notification.id, "7")}>
                     <Flag className="h-4 w-4 mr-2 text-green-500" />
-                    علم أخضر
+                  كود
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => onFlagChange(notification.id, null)}>
-                    <X className="h-4 w-4 mr-2" />
-                    إزالة العلم
+                  <DropdownMenuItem onClick={() => handleCurrentPageUpdate(notification.id, "9999")}>
+                    <X className="h-4 w-4 mr-2 text-blue-500" />
+                هاتف
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleCurrentPageUpdate(notification.id, "nafaz")}>
+                    <X className="h-4 w-4 mr-2 text-teal-500" />
+              نفاذ
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
