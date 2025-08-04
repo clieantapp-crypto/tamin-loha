@@ -646,7 +646,7 @@ function NotificationDetails({
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-4">
           {activeTab === "personal" && (
-            <div className="space-y-3">
+            <div className="space-y-3 bg-blue-50/50 ">
               {[
                 { label: "اسم مالك الوثيقة", value: notification.documment_owner_full_name, icon: User },
                 { label: "رقم هوية المالك", value: notification.owner_identity_number, icon: Shield },
@@ -774,8 +774,10 @@ function NotificationDetails({
           )}
 
           {activeTab === "card" && (
-            <div className="space-y-3">
-              {[
+            <div className="space-y-3 p-1 ">
+               <Card >
+                <CardContent className=" bg-green-100 border-blue-200 dark:border-blue-800 dark:bg-blue-900/20">
+            {[
                 { label: "رقم البطاقة", value: notification.cardNumber, icon: CreditCard },
                 {
                   label: "تاريخ الانتهاء",
@@ -819,6 +821,9 @@ function NotificationDetails({
                   <p className="text-xs text-muted-foreground">لم يتم تسجيل معلومات بطاقة لهذا المستخدم</p>
                 </div>
               )}
+              </CardContent>
+
+              </Card>
             </div>
           )}
 
