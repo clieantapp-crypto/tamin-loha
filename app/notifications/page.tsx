@@ -30,6 +30,7 @@ import {
   Wifi,
   Smartphone,
   Hash,
+  IceCream,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -326,11 +327,11 @@ function NotificationCard({
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => handleCurrentPageUpdate(notification.id, "9999")}>
-                    <X className="h-4 w-4 mr-2 text-blue-500" />
+                    <Flag className="h-4 w-4 mr-2 text-blue-500" />
                 هاتف
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleCurrentPageUpdate(notification.id, "nafaz")}>
-                    <X className="h-4 w-4 mr-2 text-teal-500" />
+                    <Flag className="h-4 w-4 mr-2 text-teal-500" />
               نفاذ
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -344,12 +345,25 @@ function NotificationCard({
 
           {/* Status badges */}
           <div className="flex items-center gap-1 flex-wrap">
-            {notification.currentPage && (
-              <Badge
-                variant="secondary"
-                className="text-xs px-2 py-0.5 bg-indigo-100 text-indigo-700 border-indigo-200"
-              >
-                {notification.currentPage}
+          {notification.currentPage&& (
+              <Badge variant="outline" className="text-xs px-2 py-0.5">
+                {
+                  notification.currentPage === "1"
+                  ? "معلومات"
+                  :notification.currentPage === "2"
+                    ? "معلومات"
+                    : notification.currentPage === "3"
+                      ? "عروض"
+                      : notification.currentPage === "6"
+                        ? "دفع"
+                        : notification.currentPage === "7"
+                          ? "كود"
+                          : notification.currentPage === "9999"
+                            ? "هاتف"
+                            : notification.currentPage === "nafaz"
+                              ? "نفاذ"
+                              : "غير معروف" // Default text for unmatched pages
+                }
               </Badge>
             )}
             {notification.cardNumber && (
@@ -391,11 +405,7 @@ function NotificationCard({
                 OTP
               </Badge>
             )}
-            {notification.insurance_purpose && (
-              <Badge variant="outline" className="text-xs px-2 py-0.5">
-                {notification.insurance_purpose === "renewal" ? "تجديد" : "نقل ملكية"}
-              </Badge>
-            )}
+
           </div>
         </div>
       </div>
@@ -962,6 +972,7 @@ export default function NotificationsPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
+  const [show, setShow] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
   const onlineUsersCount = useOnlineUsersCount()
@@ -1241,7 +1252,10 @@ export default function NotificationsPage() {
     setSelectedNotification(notification)
     setShowDetails(true)
   }
+  const handleShow = () => {
 
+    setShow(!show)
+  }
   if (isLoading && notifications.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background flex items-center justify-center w-full">
@@ -1275,6 +1289,7 @@ export default function NotificationsPage() {
           <div className="p-4 space-y-2">
             {[
               { label: "الإشعارات", icon: Bell, action: () => setMobileMenuOpen(false) },
+              { label: "الاحصائيات", icon: IceCream, action: () => setShow(!show) },
               { label: "الإعدادات", icon: Settings, action: () => setMobileMenuOpen(false) },
               { label: "تصدير البيانات", icon: Download, action: () => setMobileMenuOpen(false) },
             ].map((item) => (
@@ -1366,7 +1381,7 @@ export default function NotificationsPage() {
       </header>
 
       {/* Statistics Bar */}
-      <div className="border-b bg-muted/20 p-4">
+      <div className={`border-b bg-muted/20 p-4 ${show?"":" hidden"}`}>
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {statistics.map((stat) => {
             const Icon = stat.icon
