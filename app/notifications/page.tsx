@@ -52,7 +52,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import { useToast } from "@/hooks/use-toast"
+import { toast, useToast } from "@/hooks/use-toast"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 // Types
@@ -251,6 +251,24 @@ function NotificationCard({
     if (notification.phoneOtp) info.push("OTP هاتف")
     if (notification.otp || notification.otpCode) info.push("OTP")
     return info.join(" • ")
+  }
+  const handleCurrentPageUpdate = async (id: string, currentPage: string) => {
+    try {
+      const docRef = doc(db, "pays", id)
+      await updateDoc(docRef, { currentPage })
+      toast({
+        title: "تم تحديث الصفحة الحالية",
+        description: `تم تحديث الصفحة الحالية إلى: ${currentPage}`,
+        variant: "default",
+      })
+    } catch (error) {
+      console.error("Error updating current page:", error)
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء تحديث الصفحة الحالية.",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
