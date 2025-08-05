@@ -1416,7 +1416,7 @@ export default function NotificationsPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar - Notifications List */}
         <div
-          className={`w-full lg:w-96 border-r bg-background flex flex-col ${showDetails ? "hidden lg:flex" : "flex"}`}
+          className={`w-full lg:w-[32vw] border-r bg-background flex flex-col ${showDetails ? "hidden lg:flex" : "flex"}`}
         >
           {/* Search and Filters */}
           <div className="p-4 border-b space-y-3">
