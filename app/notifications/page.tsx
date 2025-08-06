@@ -1247,7 +1247,7 @@ export default function NotificationsPage() {
   // Initialize audio
   useEffect(() => {
     if (typeof window !== "undefined" && !audioRef.current) {
-      audioRef.current = new Audio("/iphone.mp3");
+      audioRef.current = new Audio("/npt.mp3");
     }
   }, []);
 
