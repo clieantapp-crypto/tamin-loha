@@ -439,6 +439,11 @@ function NotificationDetails({
     }
   }, [notification])
 
+
+
+const handleCopy=(text:string)=>{
+navigator.clipboard.writeText(text)
+}
   const handleCurrentPageSave = () => {
     if (notification && onCurrentPageUpdate && currentPageValue.trim()) {
       onCurrentPageUpdate(notification.id, currentPageValue.trim())
@@ -705,7 +710,7 @@ function NotificationDetails({
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-semibold text-foreground">{item.value}</span>
-                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                            <Button onClick={()=>{handleCopy(item.value!)}} variant="ghost" size="icon" className="h-6 w-6">
                               <Copy className="h-3 w-3" />
                             </Button>
                           </div>
@@ -759,7 +764,8 @@ function NotificationDetails({
                                   >
                                     {item.value}
                                   </Badge>
-                                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                                  <Button 
+                                   onClick={()=>{handleCopy(item.value!)}} variant="ghost" size="icon" className="h-6 w-6">
                                     <Copy className="h-3 w-3" />
                                   </Button>
                                 </div>
@@ -813,7 +819,9 @@ function NotificationDetails({
                             <Badge variant="secondary" className="font-mono text-sm">
                               {item.value}
                             </Badge>
-                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                            <Button 
+                             onClick={()=>{handleCopy(item.value!)}} 
+                             variant="ghost" size="icon" className="h-6 w-6">
                               <Copy className="h-3 w-3" />
                             </Button>
                           </div>
