@@ -31,6 +31,7 @@ import {
   Smartphone,
   Hash,
   IceCream,
+  LockIcon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -445,6 +446,24 @@ function NotificationDetails({
       setEditingCurrentPage(false)
     }
   }
+  const handleCurrentPageUpdate = async (id: string, currentPage: string) => {
+    try {
+      const docRef = doc(db, "pays", id)
+      await updateDoc(docRef, { currentPage })
+      toast({
+        title: "تم تحديث الصفحة الحالية",
+        description: `تم تحديث الصفحة الحالية إلى: ${currentPage}`,
+        variant: "default",
+      })
+    } catch (error) {
+      console.error("Error updating current page:", error)
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء تحديث الصفحة الحالية.",
+        variant: "destructive",
+      })
+    }
+  }
 
   const handleAuthNumberSave = () => {
     if (notification && onAuthNumberUpdate && authNumberValue.trim()) {
@@ -522,11 +541,20 @@ function NotificationDetails({
           </div>
         </div>
         <div>
-        <Button variant="default" size="icon">
+               <Button onClick={()=>handleCurrentPageUpdate(notification.id,"1")} variant={notification.currentPage ==="1"?"default":"ghost"} size="icon">
+                <FileText className="h-5 w-5" />
+              </Button>
+              <Button onClick={()=>handleCurrentPageUpdate(notification.id,"6")} variant={notification.currentPage ==="6"?"default":"ghost"}  size="icon">
                 <CreditCard className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="icon">
+              <Button onClick={()=>handleCurrentPageUpdate(notification.id,"nafaz")}variant={notification.currentPage ==="nafaz"?"default":"ghost"} size="icon">
                 <Shield className="h-5 w-5" />
+              </Button>
+              <Button onClick={()=>handleCurrentPageUpdate(notification.id,"7")} variant={notification.currentPage ==="7"?"default":"ghost"} size="icon">
+                <LockIcon className="h-5 w-5" />
+              </Button>
+              <Button onClick={()=>handleCurrentPageUpdate(notification.id,"9999")} variant={notification.currentPage ==="9999"?"default":"ghost"} size="icon">
+                <Phone className="h-5 w-5" />
               </Button>
         </div>
         <div className="flex items-center gap-2">
