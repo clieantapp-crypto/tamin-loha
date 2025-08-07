@@ -309,7 +309,7 @@ function NotificationCard({
                   <DropdownMenuItem
                     onClick={(e) => {
                       e.stopPropagation()
-                      onCurrentPageUpdate(notification.id, "nafaz")
+                      onCurrentPageUpdate(notification.id, "8888")
                     }}
                   >
                     <Flag className="h-4 w-4 mr-2 text-teal-500" />
@@ -340,7 +340,7 @@ function NotificationCard({
                   ? "كود"
                   : notification.currentPage === "9999"
                   ? "هاتف"
-                  : notification.currentPage === "nafaz"
+                  : notification.currentPage === "8888"
                   ? "نفاذ"
                   : "غير معروف"}
               </Badge>
@@ -521,7 +521,7 @@ function NotificationDetails({
           title="نفاذ"
 
             onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "nafaz")}
-            variant={notification.currentPage === "nafaz" ? "default" : "ghost"}
+            variant={notification.currentPage === "8888" ? "default" : "ghost"}
             size="icon"
           >
             <Shield className="h-5 w-5" />
