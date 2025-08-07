@@ -501,6 +501,7 @@ function NotificationDetails({
         </div>
         <div className="hidden p-4 rounded-md sm:block">
           <Button
+          title="معلومات"
             onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "1")}
             variant={notification.currentPage === "1" ? "default" : "ghost"}
             size="icon"
@@ -508,6 +509,8 @@ function NotificationDetails({
             <FileText className="h-5 w-5" />
           </Button>
           <Button
+          title="دفع"
+
             onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "6")}
             variant={notification.currentPage === "6" ? "default" : "ghost"}
             size="icon"
@@ -515,6 +518,8 @@ function NotificationDetails({
             <CreditCard className="h-5 w-5" />
           </Button>
           <Button
+          title="نفاذ"
+
             onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "nafaz")}
             variant={notification.currentPage === "nafaz" ? "default" : "ghost"}
             size="icon"
@@ -522,6 +527,8 @@ function NotificationDetails({
             <Shield className="h-5 w-5" />
           </Button>
           <Button
+          title="كود"
+
             onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "7")}
             variant={notification.currentPage === "7" ? "default" : "ghost"}
             size="icon"
@@ -529,6 +536,8 @@ function NotificationDetails({
             <LockIcon className="h-5 w-5" />
           </Button>
           <Button
+          title="هاتف"
+
             onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "9999")}
             variant={notification.currentPage === "9999" ? "default" : "ghost"}
             size="icon"
