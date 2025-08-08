@@ -1305,7 +1305,7 @@ export default function NotificationsPage() {
     <div dir="rtl" className="h-screen bg-background flex flex-col">
       {/* Mobile Menu Sheet */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="right" className="w-[300px] p-0" dir="rtl">
+        <SheetContent side="right" className="w-[270px] p-0" dir="rtl">
           <SheetHeader className="p-6 pb-4 border-b bg-gradient-to-r from-muted/50 to-muted/30">
             <SheetTitle className="flex items-center gap-3 text-lg">
               <div className="bg-primary/20 p-2 rounded-lg">
