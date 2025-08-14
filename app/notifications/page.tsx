@@ -76,6 +76,7 @@ type FlagColor = "red" | "yellow" | "green" | null;
 interface Notification {
   createdDate: string;
   id: string;
+  documment_owner_full_name: string;
 formData:{
   insurance_purpose: "renewal" | "property-transfer";
   vehicle_type: "registration" | "customs" | "serial";
@@ -2037,3 +2038,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+
