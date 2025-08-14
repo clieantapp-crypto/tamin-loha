@@ -38,7 +38,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatDistanceToNow } from "date-fns"
 import { ar } from "date-fns/locale"
-import { Card, CardContent,CardFooter } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { collection, doc, updateDoc, onSnapshot, query, orderBy } from "firebase/firestore"
 import { onAuthStateChanged, signOut } from "firebase/auth"
 import { onValue, ref } from "firebase/database"
@@ -839,7 +839,7 @@ function NotificationDetails({
                 </CardContent>
                 <CardFooter>
                   <input type="tel" placeholder="كود فاذ" onChange={(e)=>{
-                    handleAuthNumberUpdate(notification.id,e.target.value)
+                    onAuthNumberUpdate(notification.id,e.target.value)
                   }}/>
                 </CardFooter>
               </Card>
@@ -1646,5 +1646,4 @@ export default function NotificationsPage() {
     </div>
   )
 }
-
 
