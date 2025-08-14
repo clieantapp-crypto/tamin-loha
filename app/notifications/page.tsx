@@ -1524,7 +1524,7 @@ export default function NotificationsPage() {
     }
   };
 
-  const handleFlagColorChange = async (id: string, color: FlagColor) => {
+  const handleFlagColorChange = async (id: string, color: any) => {
     try {
       const docRef = doc(db, "pays", id);
       await updateDoc(docRef, { flagColor: color });
