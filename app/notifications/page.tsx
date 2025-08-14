@@ -177,7 +177,7 @@ function NotificationCard({
 }) {
   const getCardBackground = () => {
     if (notification.flagColor) {
-      const colorMap: Record<NonNullable<FlagColor>, string> = {
+      const colorMap: Record<NonNullable<any>, string> = {
         red: "border-l-4 border-red-500 bg-red-50/50 dark:bg-red-900/10",
         yellow:
           "border-l-4 border-yellow-500 bg-yellow-50/50 dark:bg-yellow-900/10",
