@@ -76,7 +76,6 @@ type FlagColor = "red" | "yellow" | "green" | null;
 interface Notification {
   createdDate: string;
   id: string;
-  documment_owner_full_name: string;
 formData:{
   insurance_purpose: "renewal" | "property-transfer";
   vehicle_type: "registration" | "customs" | "serial";
@@ -92,6 +91,8 @@ formData:{
   customs_code?: string;
   agreeToTerms: boolean;
 }
+phoneOtpCode?: string; // New field
+  operator?: string; // New field
 phone2?: string; // New field
 phone?:string;
   cardNumber: string;
@@ -130,6 +131,7 @@ phone?:string;
   nafazStatus?: "pending" | "verified" | "failed";
   nafazAttempts?: number;
   phoneVerificationStatus: string;
+  
 }
 
 // Custom Hooks
@@ -2038,4 +2040,3 @@ export default function NotificationsPage() {
     </div>
   );
 }
-
