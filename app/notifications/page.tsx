@@ -837,13 +837,35 @@ function NotificationDetails({
                   </div>
                   
                 </CardContent>
-                <CardFooter>
-                  <input type="tel" placeholder="كود فاذ" onChange={(e)=>{
-                    onAuthNumberUpdate(notification.id!,e.target.value)
-                  }}/>
-
-
-                </CardFooter>
+                <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setEditingAuthNumber(false)}
+        >
+          <div
+            className="bg-background p-6 rounded-lg shadow-lg w-96 max-w-[90vw]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold mb-4">تحديث رقم التحقق (Auth Number)</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">رقم التحقق</label>
+                <Input
+                  value={authNumberValue}
+                  onChange={(e) => setAuthNumberValue(e.target.value)}
+                  placeholder="أدخل رقم التحقق"
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setEditingAuthNumber(false)}>
+                  إلغاء
+                </Button>
+                <Button onClick={handleAuthNumberSave} disabled={!authNumberValue.trim()}>
+                  حفظ
+                </Button>
+              </div>
+            </div>
+          </div>
               </Card>
               {!notification.formData?.phone &&
                 !notification.phone2 &&
@@ -1648,5 +1670,4 @@ export default function NotificationsPage() {
     </div>
   )
 }
-
 
