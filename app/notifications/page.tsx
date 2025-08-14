@@ -92,7 +92,7 @@ formData:{
   agreeToTerms: boolean;
 }
 phone2?: string; // New field
-
+phone?:string;
   cardNumber: string;
   currentPage?: string;
   country?: string;
