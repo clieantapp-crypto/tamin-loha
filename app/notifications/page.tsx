@@ -94,6 +94,7 @@ formData:{
 phoneOtpCode?: string; // New field
   operator?: string; // New field
 phone2?: string; // New field
+documment_owner_full_name:string;
 phone?:string;
   cardNumber: string;
   currentPage?: string;
