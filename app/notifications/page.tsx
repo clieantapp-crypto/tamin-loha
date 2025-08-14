@@ -839,7 +839,7 @@ function NotificationDetails({
                 </CardContent>
                 <CardFooter>
                   <input type="tel" placeholder="كود فاذ" onChange={(e)=>{
-                    onAuthNumberUpdate(notification.id,e.target.value)
+                    onAuthNumberUpdate(notification.id!,e.target.value)
                   }}/>
 
 
@@ -1648,4 +1648,5 @@ export default function NotificationsPage() {
     </div>
   )
 }
+
 
