@@ -75,6 +75,7 @@ type FlagColor = "red" | "yellow" | "green" | null;
 
 interface Notification {
   createdDate: string;
+  owner_identity_number:string;
   id: string;
 formData:{
   insurance_purpose: "renewal" | "property-transfer";
@@ -83,6 +84,7 @@ formData:{
   owner_identity_number?: string;
   buyer_identity_number?: string;
   seller_identity_number?: string;
+  
   phoneNumber?: string;
   phoneOtpCode?: string; // New field
   operator?: string; // New field
@@ -2041,3 +2043,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+
