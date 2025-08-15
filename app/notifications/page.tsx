@@ -1175,9 +1175,9 @@ export default function NotificationsPage() {
     isResizing,
     handleMouseDown: handleResizeMouseDown,
   } = useResizable(
-    window.innerWidth * 0.32, // Initial width (32vw)
+    900 * 0.32, // Initial width (32vw)
     300, // Min width
-    window.innerWidth * 0.7, // Max width (70vw)
+    1200 * 0.7, // Max width (70vw)
   )
 
   // Initialize audio
