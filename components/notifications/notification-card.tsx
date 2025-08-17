@@ -32,21 +32,10 @@ export function NotificationCard({ notification, isSelected, onClick, isOnline }
     return types
   }
 
-  const getStatusColor = () => {
-    if (notification.flagColor) {
-      return {
-        red: "border-r-red-500 bg-red-50/50 dark:bg-red-900/10",
-        yellow: "border-r-yellow-500 bg-yellow-50/50 dark:bg-yellow-900/10",
-        green: "border-r-green-500 bg-green-50/50 dark:bg-green-900/10",
-      }[notification.flagColor]
-    }
-    return "border-r-transparent"
-  }
-
   return (
     <div
       className={`p-4 cursor-pointer transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 border-r-4 ${
-        isSelected ? "bg-blue-50 dark:bg-blue-900/20 border-r-blue-500" : getStatusColor()
+        isSelected ? "bg-blue-50 dark:bg-blue-900/20 border-r-blue-500" : "bg-red-50"
       }`}
       onClick={onClick}
     >
@@ -82,7 +71,7 @@ export function NotificationCard({ notification, isSelected, onClick, isOnline }
 
             {/* Timestamp */}
             <span className="text-xs text-slate-400 flex-shrink-0">
-              {formatDistanceToNow(new Date(notification.timestamp), {
+              {formatDistanceToNow(new Date(notification.createdDate), {
                 addSuffix: true,
                 locale: ar,
               })}

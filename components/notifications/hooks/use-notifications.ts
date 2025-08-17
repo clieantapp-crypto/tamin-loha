@@ -32,7 +32,7 @@ export function useNotifications() {
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const newNotifications = snapshot.docs.map((doc) => ({
-        id: doc.id,
+        id: doc.id, 
         ...doc.data(),
       }))
 
