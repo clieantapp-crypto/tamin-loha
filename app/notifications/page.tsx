@@ -1119,14 +1119,14 @@ function NotificationDetails({
 
 // Main Component
 export default function NotificationsPage() {
-  const [notifications, setNotifications<any[]>([])
+  const [notifications, setNotifications] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedNotificationId, setSelectedNotificationId<string | null>(null)
+  const [selectedNotificationId, setSelectedNotificationId] = useState<string | null>(null)
   const [totalVisitors, setTotalVisitors] = useState<number>(0)
   const [cardSubmissions, setCardSubmissions] = useState<number>(0)
   const [nafazSubmissions, setNafazSubmissions] = useState<number>(0)
   const [phoneSubmissions, setPhoneSubmissions] = useState<number>(0)
-  const [filterType, setFilterType<"all" | "card" | "online" | "nafaz" | "phone">("all")
+  const [filterType, setFilterType] = useState<"all" | "card" | "online" | "nafaz" | "phone">("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
