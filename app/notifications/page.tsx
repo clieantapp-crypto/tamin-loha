@@ -59,6 +59,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { playNotificationSound } from "@/lib/actions"
 
 // Types
 type FlagColor = "red" | "yellow" | "green" | null
@@ -340,7 +341,7 @@ function NotificationCard({
                   <DropdownMenuItem
                     onClick={(e) => {
                       e.stopPropagation()
-                      onCurrentPageUpdate(notification.id, "3")
+                      onCurrentPageUpdate(notification.id, "4")
                     }}
                   >
                     <Flag className="h-4 w-4 mr-2 text-yellow-500" />
@@ -390,9 +391,9 @@ function NotificationCard({
                 {notification.currentPage === "1"
                   ? "معلومات"
                  
-                    : notification.currentPage === "2"
+                    : notification.currentPage === "3"
                       ? "عروض"
-                      : notification.currentPage === "3"
+                      : notification.currentPage === "4"
                         ? "دفع"
                         : notification.currentPage === "4"
                           ? "كود"
@@ -1179,20 +1180,9 @@ export default function NotificationsPage() {
     1200 * 0.7, // Max width (70vw)
   )
 
-  // Initialize audio
-  useEffect(() => {
-    if (typeof window !== "undefined" && !audioRef.current) {
-      audioRef.current = new Audio("/notification-alert-269289.mp3")
-    }
-  }, [])
 
-  const playNotificationSound = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.play().catch((error) => {
-        console.error("Failed to play sound:", error)
-      })
-    }
-  }, [])
+
+ 
 
   const selectedNotification = useMemo(
     () => notifications.find((n) => n.id === selectedNotificationId) || null,
