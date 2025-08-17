@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { ThemeToggle } from "../theam"
 
 interface DashboardHeaderProps {
   onlineUsersCount: number
@@ -20,6 +21,7 @@ interface DashboardHeaderProps {
 export function DashboardHeader({ onlineUsersCount, onLogout, onMenuToggle }: DashboardHeaderProps) {
   return (
     <header className="h-16 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 flex items-center justify-between">
+<ThemeToggle/>
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" className="lg:hidden" onClick={onMenuToggle}>
           <Menu className="h-5 w-5" />
