@@ -3,12 +3,44 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import type React from "react"
 
 import { useRouter } from "next/navigation"
-import { Trash2, Users, CreditCard, UserCheck, Flag, Bell, LogOut, Search, Calendar, Download, Settings, User, Menu, ChevronRight, FileText, Shield, Key, UserX, Eye, Copy, Phone, MessageSquare, MoreVertical, Filter, X, Wifi, Smartphone, Hash, IceCream, LockIcon, GripVertical, Activity, TrendingUp, Clock, CheckCircle2, AlertCircle, Zap } from 'lucide-react'
+import {
+  Trash2,
+  Users,
+  CreditCard,
+  UserCheck,
+  Flag,
+  Bell,
+  LogOut,
+  Search,
+  Calendar,
+  Download,
+  Settings,
+  User,
+  Menu,
+  ChevronRight,
+  FileText,
+  Shield,
+  Key,
+  UserX,
+  Eye,
+  Copy,
+  Phone,
+  MessageSquare,
+  MoreVertical,
+  Filter,
+  X,
+  Wifi,
+  Smartphone,
+  Hash,
+  IceCream,
+  LockIcon,
+  GripVertical,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatDistanceToNow } from "date-fns"
 import { ar } from "date-fns/locale"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { collection, doc, updateDoc, onSnapshot, query, orderBy } from "firebase/firestore"
 import { onAuthStateChanged, signOut } from "firebase/auth"
 import { onValue, ref } from "firebase/database"
@@ -35,7 +67,7 @@ function ResizeHandle({
   onMouseDown,
   isResizing,
 }: {
-  onMouseDown: (React.MouseEvent) => void
+  onMouseDown: (e: React.MouseEvent) => void
   isResizing: boolean
 }) {
   return (
@@ -132,7 +164,7 @@ function useResizable(initialWidth: number, minWidth: number, maxWidth: number) 
 
 // Components
 function UserStatus({ userId }: { userId: string }) {
-  const [status, setStatus<"online" | "offline" | "unknown">("unknown")
+  const [status, setStatus] = useState<"online" | "offline" | "unknown">("unknown")
 
   useEffect(() => {
     const userStatusRef = ref(database, `/status/${userId}`)
@@ -190,50 +222,6 @@ function NafazStatus({ notification }: { notification: any }) {
   return <div className={`h-2 w-2 rounded-full ${config.color}`} title={`نفاذ: ${config.text}`} />
 }
 
-function StatisticsCard({ title, value, icon: Icon, color, trend }: {
-  title: string
-  value: number
-  icon: any
-  color: string
-  trend?: { value: number; isPositive: boolean }
-}) {
-  return (
-    <Card className="relative overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-card to-card/50">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className={`p-3 rounded-xl ${
-            color === "emerald"
-              ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
-              : color === "blue"
-                ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
-                : color === "cyan"
-                  ? "bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400"
-                  : color === "purple"
-                    ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
-                    : "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
-          }`}>
-            <Icon className="h-6 w-6" />
-          </div>
-          {trend && (
-            <div className={`flex items-center gap-1 text-sm font-medium ${
-              trend.isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
-            }`}>
-              <TrendingUp className={`h-4 w-4 ${trend.isPositive ? "" : "rotate-180"}`} />
-              {Math.abs(trend.value)}%
-            </div>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="space-y-1">
-          <p className="text-3xl font-bold text-foreground">{value.toLocaleString()}</p>
-          <p className="text-sm text-muted-foreground font-medium">{title}</p>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
 function NotificationCard({
   notification,
   isSelected,
@@ -250,24 +238,24 @@ function NotificationCard({
   const getCardBackground = () => {
     if (notification.flagColor) {
       const colorMap: Record<NonNullable<any>, string> = {
-        red: "border-l-4 border-red-500 bg-gradient-to-r from-red-50/80 to-transparent dark:from-red-900/20",
-        yellow: "border-l-4 border-yellow-500 bg-gradient-to-r from-yellow-50/80 to-transparent dark:from-yellow-900/20",
-        green: "border-l-4 border-green-500 bg-gradient-to-r from-green-50/80 to-transparent dark:from-green-900/20",
+        red: "border-l-4 border-red-500 bg-red-50/50 dark:bg-red-900/10",
+        yellow: "border-l-4 border-yellow-500 bg-yellow-50/50 dark:bg-yellow-900/10",
+        green: "border-l-4 border-green-500 bg-green-50/50 dark:bg-green-900/10",
       }
       return colorMap[notification.flagColor]
     }
 
     if (notification.cardNumber) {
-      return "border-l-4 border-emerald-500 bg-gradient-to-r from-emerald-50/80 to-transparent dark:from-emerald-900/20"
+      return "border-l-4 border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10"
     }
     if (notification.nafadUsername) {
-      return "border-l-4 border-purple-500 bg-gradient-to-r from-purple-50/80 to-transparent dark:from-purple-900/20"
+      return "border-l-4 border-purple-500 bg-purple-50/50 dark:bg-purple-900/10"
     }
     if (notification.phone || notification.phone2) {
-      return "border-l-4 border-blue-500 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20"
+      return "border-l-4 border-blue-500 bg-blue-50/50 dark:bg-blue-900/10"
     }
 
-    return "border-l-4 border-transparent hover:border-l-primary/30"
+    return "border-l-4 border-transparent"
   }
 
   const getPrimaryInfo = () => {
@@ -301,114 +289,156 @@ function NotificationCard({
 
   return (
     <div
-      className={`group p-4 border-b border-border/30 cursor-pointer transition-all duration-300 hover:bg-muted/40 hover:shadow-sm ${
-        isSelected ? "bg-primary/5 border-r-4 border-r-primary shadow-sm" : ""
+      className={`p-4 border-b border-border/50 cursor-pointer transition-all duration-200 hover:bg-muted/30 ${
+        isSelected ? "bg-primary/5 border-r-4 border-r-primary" : ""
       } ${getCardBackground()}`}
       onClick={onClick}
     >
-      <div className="flex items-start gap-4">
-        {/* Enhanced Avatar with status indicator */}
+      <div className="flex items-start gap-3">
+        {/* Avatar */}
         <div className="relative flex-shrink-0">
-          <Avatar className="h-12 w-12 border-2 border-background shadow-md ring-2 ring-primary/10">
+          <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
             <AvatarImage src="/placeholder.svg?height=48&width=48" />
-            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-bold text-sm">
+            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold text-sm">
               {getPrimaryInfo().slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="absolute -bottom-1 -right-1">
+          <div className="absolute -bottom-1 -right-1 flex items-center gap-1">
             <UserStatus userId={notification.id} />
+            <NafazStatus notification={notification} />
           </div>
-          {notification.nafadUsername && (
-            <div className="absolute -top-1 -right-1">
-              <NafazStatus notification={notification} />
-            </div>
-          )}
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0 space-y-2">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-foreground truncate text-base">
-                {getPrimaryInfo()}
-              </h3>
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                {getSecondaryInfo()}
-              </p>
-            </div>
-            
-            {/* Time and actions */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <div className="text-xs text-muted-foreground flex items-center gap-1">
-                <Clock className="h-3 w-3" />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <h3 className="font-semibold text-foreground text-sm truncate">{getPrimaryInfo()}</h3>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <span className="text-xs text-muted-foreground">
                 {notification.createdDate &&
                   formatDistanceToNow(new Date(notification.createdDate), {
                     addSuffix: true,
                     locale: ar,
                   })}
-              </div>
-              
-              {/* Flag dropdown */}
+              </span>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <Flag className={`h-4 w-4 ${
-                      notification.flagColor === "red" ? "text-red-500 fill-red-500" :
-                      notification.flagColor === "yellow" ? "text-yellow-500 fill-yellow-500" :
-                      notification.flagColor === "green" ? "text-green-500 fill-green-500" :
-                      "text-muted-foreground"
-                    }`} />
+                  <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100">
+                    <MoreVertical className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-32">
-                  <DropdownMenuItem onClick={() => onFlagChange(notification.id, "red")}>
-                    <Flag className="h-4 w-4 text-red-500 fill-red-500 mr-2" />
-                    أحمر
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onCurrentPageUpdate(notification.id, "1")
+                    }}
+                  >
+                    <Flag className="h-4 w-4 mr-2 text-red-500" />
+                    معلومات
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onFlagChange(notification.id, "yellow")}>
-                    <Flag className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-2" />
-                    أصفر
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onCurrentPageUpdate(notification.id, "3")
+                    }}
+                  >
+                    <Flag className="h-4 w-4 mr-2 text-yellow-500" />
+                    دفع
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onFlagChange(notification.id, "green")}>
-                    <Flag className="h-4 w-4 text-green-500 fill-green-500 mr-2" />
-                    أخضر
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onCurrentPageUpdate(notification.id, "4")
+                    }}
+                  >
+                    <Flag className="h-4 w-4 mr-2 text-green-500" />
+                    كود
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onFlagChange(notification.id, null)}>
-                    <X className="h-4 w-4 mr-2" />
-                    إزالة
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onCurrentPageUpdate(notification.id, "9999")
+                    }}
+                  >
+                    <Flag className="h-4 w-4 mr-2 text-blue-500" />
+                    هاتف
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onCurrentPageUpdate(notification.id, "8888")
+                    }}
+                  >
+                    <Flag className="h-4 w-4 mr-2 text-teal-500" />
+                    نفاذ
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
 
+          <p className="text-xs text-muted-foreground mb-2 truncate">
+            {getSecondaryInfo() || "لا توجد معلومات إضافية"}
+          </p>
+
           {/* Status badges */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1 flex-wrap">
+            {notification.currentPage && (
+              <Badge variant="outline" className="text-xs px-2 py-0.5">
+                {notification.currentPage === "1"
+                  ? "معلومات"
+                 
+                    : notification.currentPage === "2"
+                      ? "عروض"
+                      : notification.currentPage === "3"
+                        ? "دفع"
+                        : notification.currentPage === "4"
+                          ? "كود"
+                          : notification.currentPage === "9999"
+                            ? "هاتف"
+                            : notification.currentPage === "8888"
+                              ? "نفاذ"
+                              : "غير معروف"}
+              </Badge>
+            )}
             {notification.cardNumber && (
-              <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs">
-                <CreditCard className="h-3 w-3 mr-1" />
+              <Badge
+                variant="secondary"
+                className="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-700 border-emerald-200"
+              >
                 بطاقة
               </Badge>
             )}
             {notification.nafadUsername && (
-              <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 text-xs">
-                <Shield className="h-3 w-3 mr-1" />
+              <Badge
+                variant="secondary"
+                className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 border-purple-200"
+              >
                 نفاذ
               </Badge>
             )}
-            {(notification.phone || notification.phone2) && (
-              <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-xs">
-                <Phone className="h-3 w-3 mr-1" />
-                هاتف
+            {notification.phone2 && (
+              <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 border-blue-200">
+                هاتف ثاني
               </Badge>
             )}
             {notification.phoneOtpCode && (
-              <Badge variant="secondary" className="bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 text-xs">
-                <Key className="h-3 w-3 mr-1" />
+              <Badge
+                variant="secondary"
+                className="text-xs px-2 py-0.5 bg-orange-100 text-orange-700 border-orange-200"
+              >
+                OTP هاتف
+              </Badge>
+            )}
+            {notification.operator && (
+              <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-cyan-100 text-cyan-700 border-cyan-200">
+                شبكة
+              </Badge>
+            )}
+            {(notification.otp || notification.otpCode) && (
+              <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-amber-100 text-amber-700 border-amber-200">
                 OTP
               </Badge>
             )}
@@ -430,7 +460,7 @@ function NotificationDetails({
   onCurrentPageUpdate?: (id: string, currentPage: string) => void
   onAuthNumberUpdate?: (id: string, authNumber: string) => void
 }) {
-  const [activeTab, setActiveTab<"personal" | "card" | "nafaz" | "phone">("personal")
+  const [activeTab, setActiveTab] = useState<"personal" | "card" | "nafaz" | "phone">("personal")
   const [editingCurrentPage, setEditingCurrentPage] = useState(false)
   const [currentPageValue, setCurrentPageValue] = useState("")
   const [editingAuthNumber, setEditingAuthNumber] = useState(false)
@@ -541,7 +571,7 @@ function NotificationDetails({
           </Button>
           <Button
             title="دفع"
-            onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "6")}
+            onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "3")}
             variant={notification.currentPage === "6" ? "default" : "ghost"}
             size="icon"
           >
@@ -557,7 +587,7 @@ function NotificationDetails({
           </Button>
           <Button
             title="كود"
-            onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "7")}
+            onClick={() => onCurrentPageUpdate && onCurrentPageUpdate(notification.id, "4")}
             variant={notification.currentPage === "7" ? "default" : "ghost"}
             size="icon"
           >
@@ -887,7 +917,7 @@ function NotificationDetails({
                     )}
 
                     <div
-                      className="bg-background p-6 rounded-lg shadow-lg w-96 max-w-[90vw]"
+                      className="bg-background p-6 rounded-lg shadow-lg w-full max-w-[90vw]"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <h3 className="text-lg font-semibold mb-4">تحديث رقم التحقق (Auth Number)</h3>
@@ -1137,7 +1167,7 @@ export default function NotificationsPage() {
   const onlineUsersCount = useOnlineUsersCount()
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const prevNotificationsRef = useRef<any[]>([])
-  const [onlineStatuses, setOnlineStatuses<Record<string, boolean>>({})
+  const [onlineStatuses, setOnlineStatuses] = useState<Record<string, boolean>>({})
 
   const {
     width: sidebarWidth,
@@ -1211,45 +1241,41 @@ export default function NotificationsPage() {
     })
   }, [notifications, filterType, onlineStatuses, searchTerm])
 
+  // Statistics
   const statistics = useMemo(
     () => [
       {
-        title: "المتصلين الآن",
+        title: "المتصلين",
         value: onlineUsersCount,
-        icon: Activity,
+        icon: UserCheck,
         color: "emerald",
-        trend: { value: 12, isPositive: true }
       },
       {
         title: "إجمالي الزوار",
         value: totalVisitors,
         icon: Users,
         color: "blue",
-        trend: { value: 8, isPositive: true }
       },
       {
-        title: "البطاقات المرسلة",
-        value: cardSubmissions,
-        icon: CreditCard,
-        color: "cyan",
-        trend: { value: 5, isPositive: false }
-      },
-      {
-        title: "نفاذ المرسل",
-        value: nafazSubmissions,
-        icon: Shield,
-        color: "purple",
-        trend: { value: 15, isPositive: true }
-      },
-      {
-        title: "الهواتف المرسلة",
+        title: "الهواتف",
         value: phoneSubmissions,
         icon: Smartphone,
+        color: "cyan",
+      },
+      {
+        title: "البطاقات",
+        value: cardSubmissions,
+        icon: CreditCard,
+        color: "purple",
+      },
+      {
+        title: "نفاذ",
+        value: nafazSubmissions,
+        icon: Key,
         color: "indigo",
-        trend: { value: 3, isPositive: true }
       },
     ],
-    [onlineUsersCount, totalVisitors, cardSubmissions, nafazSubmissions, phoneSubmissions],
+    [onlineUsersCount, totalVisitors, phoneSubmissions, cardSubmissions, nafazSubmissions],
   )
 
   // Listen for online statuses
@@ -1454,7 +1480,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-background" dir="rtl">
+    <div dir="rtl" className="h-screen bg-background flex flex-col">
       {/* Mobile Menu Sheet */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="right" className="w-[270px] p-0" dir="rtl">
@@ -1510,65 +1536,65 @@ export default function NotificationsPage() {
         </SheetContent>
       </Sheet>
 
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="flex items-center justify-between p-4">
+      {/* Header */}
+      <header className="border-b bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
+        <div className="flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-xl">
-                <Bell className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-foreground">لوحة الإشعارات</h1>
-                <p className="text-sm text-muted-foreground">إدارة الإشعارات في الوقت الفعلي</p>
-              </div>
-            </div>
-            
-            {/* Real-time indicator */}
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
-              <div className="h-2 w-2 bg-emerald-500 rounded-full pulse-glow"></div>
-              <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">مباشر</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Quick stats toggle */}
             <Button
               variant="ghost"
-              size="sm"
-              onClick={() => setShow(!show)}
-              className="gap-2"
+              size="icon"
+              className="lg:hidden hover:bg-primary/10 rounded-lg"
+              onClick={() => setMobileMenuOpen(true)}
             >
-              <TrendingUp className="h-4 w-4" />
-              الإحصائيات
+              <Menu className="h-5 w-5" />
             </Button>
-
-            {/* User menu */}
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-br from-primary to-primary/80 p-2.5 rounded-xl shadow-lg">
+                <Bell className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div className="hidden sm:block">
+                <h1 className="text-xl font-bold">لوحة الإشعارات</h1>
+                <p className="text-xs text-muted-foreground">إدارة شاملة للإشعارات والمستخدمين</p>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                    <AvatarFallback className="bg-primary/20 text-primary font-semibold text-xs">
-                      AD
-                    </AvatarFallback>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-primary/10">
+                  <Avatar className="h-10 w-10 border-2 border-primary/20">
+                    <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Admin" />
+                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">مد</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>حسابي</DropdownMenuLabel>
+              <DropdownMenuContent align="end" className="w-64" sideOffset={8}>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-2 p-2">
+                    <p className="text-sm font-semibold leading-none">مدير النظام</p>
+                    <p className="text-xs leading-none text-muted-foreground">admin@example.com</p>
+                    <div className="flex items-center gap-2 pt-1">
+                      <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-xs text-emerald-600">متصل الآن</span>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <User className="h-4 w-4 mr-2" />
-                  الملف الشخصي
+                <DropdownMenuItem className="gap-3 p-3">
+                  <Settings className="h-4 w-4" />
+                  <span>الإعدادات</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="h-4 w-4 mr-2" />
-                  الإعدادات
+                <DropdownMenuItem className="gap-3 p-3">
+                  <Download className="h-4 w-4" />
+                  <span>تصدير البيانات</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">
-                  <LogOut className="h-4 w-4 mr-2" />
-                  تسجيل الخروج
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-red-500 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/50 gap-3 p-3"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>تسجيل الخروج</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -1576,96 +1602,110 @@ export default function NotificationsPage() {
         </div>
       </header>
 
-      <div className={`border-b bg-muted/30 p-6 transition-all duration-300 ${show ? "block" : "hidden"}`}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {statistics.map((stat) => (
-            <StatisticsCard
-              key={stat.title}
-              title={stat.title}
-              value={stat.value}
-              icon={stat.icon}
-              color={stat.color}
-              trend={stat.trend}
-            />
-          ))}
+      {/* Statistics Bar */}
+      <div className={`border-b bg-muted/20 p-4 ${show ? "" : " hidden"}`}>
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          {statistics.map((stat) => {
+            const Icon = stat.icon
+            return (
+              <div key={stat.title} className="flex items-center gap-3 p-3 rounded-lg bg-background border">
+                <div
+                  className={`p-2 rounded-lg ${
+                    stat.color === "emerald"
+                      ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
+                      : stat.color === "blue"
+                        ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+                        : stat.color === "cyan"
+                          ? "bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400"
+                          : stat.color === "purple"
+                            ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                            : "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-foreground">{stat.value.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">{stat.title}</p>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
+        {/* Sidebar - Notifications List */}
         <div
-          className={`border-r bg-card/30 backdrop-blur-sm flex flex-col ${showDetails ? "hidden lg:flex" : "flex"}`}
+          className={`border-r bg-background flex flex-col ${showDetails ? "hidden lg:flex" : "flex"}`}
           style={{
             width: window.innerWidth >= 1024 ? `${sidebarWidth}px` : "100%",
           }}
         >
-          {/* Enhanced Search and Filters */}
-          <div className="p-4 border-b space-y-4 bg-background/50">
+          {/* Search and Filters */}
+          <div className="p-4 border-b space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:right-3 rtl:left-auto" />
               <Input
                 type="search"
-                placeholder="البحث في الإشعارات..."
-                className="pl-10 pr-4 rtl:pr-10 rtl:pl-4 bg-background border-border/50 focus:border-primary/50 transition-colors"
+                placeholder="بحث في الإشعارات..."
+                className="pl-10 pr-4 rtl:pr-10 rtl:pl-4"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setShowFilters(!showFilters)} 
-                className="gap-2 text-muted-foreground hover:text-foreground"
-              >
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setShowFilters(!showFilters)} className="gap-2">
                 <Filter className="h-4 w-4" />
-                فلترة ({filteredNotifications.length})
+                فلترة
               </Button>
               {filterType !== "all" && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setFilterType("all")}
-                  className="gap-2 text-muted-foreground hover:text-foreground"
+                  className="gap-2 text-muted-foreground"
                 >
                   <X className="h-3 w-3" />
-                  مسح
+                  إزالة الفلتر
                 </Button>
               )}
             </div>
 
-            {/* Enhanced filter buttons */}
             {showFilters && (
-              <div className="grid grid-cols-2 gap-2">
+              <div className="flex gap-2 flex-wrap">
                 {[
                   {
                     label: "الكل",
                     type: "all",
                     count: filteredNotifications.length,
                     icon: Users,
-                    color: "default"
                   },
                   {
                     label: "الهواتف",
                     type: "phone",
                     count: notifications.filter((n) => !n.isHidden && (n.phone || n.phone2 || n.phoneOtpCode)).length,
                     icon: Smartphone,
-                    color: "blue"
                   },
                   {
                     label: "البطاقات",
                     type: "card",
                     count: notifications.filter((n) => !n.isHidden && n.cardNumber).length,
                     icon: CreditCard,
-                    color: "emerald"
                   },
                   {
                     label: "نفاذ",
                     type: "nafaz",
                     count: notifications.filter((n) => !n.isHidden && n.nafadUsername).length,
                     icon: Key,
-                    color: "purple"
+                  },
+                  {
+                    label: "المتصلين",
+                    type: "online",
+                    count: filteredNotifications.filter((n) => onlineStatuses[n.id]).length,
+                    icon: UserCheck,
                   },
                 ].map((filter) => (
                   <Button
@@ -1673,10 +1713,10 @@ export default function NotificationsPage() {
                     variant={filterType === filter.type ? "default" : "outline"}
                     onClick={() => setFilterType(filter.type as any)}
                     size="sm"
-                    className="justify-start gap-2 h-auto py-2"
+                    className="gap-2"
                   >
-                    <filter.icon className="h-4 w-4" />
-                    <span className="flex-1 text-left">{filter.label}</span>
+                    <filter.icon className="h-3 w-3" />
+                    {filter.label}
                     <Badge variant="secondary" className="text-xs">
                       {filter.count}
                     </Badge>
@@ -1686,9 +1726,9 @@ export default function NotificationsPage() {
             )}
           </div>
 
-          {/* Enhanced Notifications List */}
+          {/* Notifications List */}
           <ScrollArea className="flex-1">
-            <div className="divide-y divide-border/30">
+            <div className="divide-y">
               {filteredNotifications.length > 0 ? (
                 filteredNotifications.map((notification) => (
                   <div key={notification.id} className="group">
@@ -1702,14 +1742,14 @@ export default function NotificationsPage() {
                   </div>
                 ))
               ) : (
-                <div className="flex flex-col items-center justify-center py-16 text-center px-4">
-                  <div className="bg-muted/50 rounded-full p-8 mb-6">
-                    <Bell className="h-16 w-16 text-muted-foreground" />
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="bg-muted/50 rounded-full p-6 mb-4">
+                    <Bell className="h-12 w-12 text-muted-foreground" />
                   </div>
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-semibold text-foreground">لا توجد إشعارات</h3>
-                    <p className="text-sm text-muted-foreground max-w-sm">
-                      {searchTerm ? "حاول تعديل مصطلحات البحث أو الفلاتر للعثور على النتائج." : "ستظهر الإشعارات الجديدة هنا عند وصولها."}
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">لا توجد إشعارات</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {searchTerm ? "حاول تعديل مصطلحات البحث أو الفلاتر." : "ستظهر الإشعارات الجديدة هنا."}
                     </p>
                   </div>
                 </div>
@@ -1718,12 +1758,12 @@ export default function NotificationsPage() {
           </ScrollArea>
         </div>
 
-        {/* Resize handle */}
         <div className="hidden lg:block">
           <ResizeHandle onMouseDown={handleResizeMouseDown} isResizing={isResizing} />
         </div>
 
-        <div className={`flex-1 ${showDetails ? "flex slide-in-right" : "hidden lg:flex"}`}>
+        {/* Details Panel */}
+        <div className={`flex-1 ${showDetails ? "flex" : "hidden lg:flex"}`}>
           <NotificationDetails
             notification={selectedNotification}
             onClose={() => setShowDetails(false)}
@@ -1732,16 +1772,6 @@ export default function NotificationsPage() {
           />
         </div>
       </div>
-
-      {/* Enhanced loading overlay */}
-      {isLoading && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="text-center space-y-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary/20 border-t-primary mx-auto"></div>
-            <p className="text-sm text-muted-foreground">جاري تحميل الإشعارات...</p>
-          </div>
-        </div>
-      )}
 
       <style jsx global>{`
         .animate-indeterminate-progress {
