@@ -28,7 +28,7 @@ export function useNotifications() {
   // Listen to notifications
   useEffect(() => {
     const notificationsRef = collection(db, "pays")
-    const q = query(notificationsRef, orderBy("createdDate ", "desc"))
+    const q = query(notificationsRef, orderBy("createdDate", "desc"))
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const newNotifications = snapshot.docs.map((doc) => ({
